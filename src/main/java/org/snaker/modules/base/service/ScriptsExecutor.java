@@ -22,9 +22,14 @@ import org.slf4j.LoggerFactory;
 import org.snaker.engine.access.ScriptRunner;
 import org.snaker.engine.access.jdbc.JdbcHelper;
 
+import com.ibatis.common.resources.Resources;
+
 import javax.sql.DataSource;
+
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * 脚本执行类
@@ -35,16 +40,18 @@ public class ScriptsExecutor {
     private static final Logger log = LoggerFactory.getLogger(ScriptsExecutor.class);
     //数据源
     private DataSource dataSource;
-
+    
     public void setDataSource(DataSource dataSource) {
+    	log.info("dataSource dataSource......"+dataSource.toString());
         this.dataSource = dataSource;
     }
 
     public void run() {
-        log.info("scripts running......");
+        log.info("scripts running......>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
+//        	conn = getConnection();
             if(JdbcHelper.isExec(conn)) {
                 log.info("script has completed execution.skip this step");
                 return;
@@ -64,6 +71,17 @@ public class ScriptsExecutor {
             } catch (SQLException e) {
                 //ignore
             }
+            log.info("scripts has runned......<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
+    }
+    public Connection getConnection() throws Exception{
+    	Properties props = Resources.getResourceAsProperties("jdbc.properties");
+		String url = props.getProperty("jdbc.url");
+		String driver = props.getProperty("jdbc.driverClassName");
+		String username = props.getProperty("jdbc.username");
+		String password = props.getProperty("jdbc.password");
+		Class.forName(driver).newInstance();
+		Connection conn = (Connection) DriverManager.getConnection(url, username, password);
+		return conn;
     }
 }

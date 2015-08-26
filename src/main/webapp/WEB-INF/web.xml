@@ -181,6 +181,7 @@
 		<servlet-name>ViewerServlet</servlet-name>
 		<url-pattern>/frameset</url-pattern>
 	</servlet-mapping>
+	<!--  
 	<servlet-mapping>
 		<servlet-name>EngineServlet</servlet-name>
 		<url-pattern>/preview</url-pattern>
@@ -213,7 +214,7 @@
 		<servlet-name>EngineServlet</servlet-name>
 		<url-pattern>/parameter</url-pattern>
 	</servlet-mapping>
-
+-->
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.springframework.context.annotation.Lazy;
+
 /**
  * 菜单实体类，继承抽象安全实体类
  * @author yuqs
@@ -139,6 +141,7 @@ public class Menu extends SecurityEntity
 
 	@ManyToOne
 	@JoinColumn(name = "pid")
+	@Lazy
 	public Menu getPid()
 	{
 		return pid;
