@@ -1,0 +1,57 @@
+package com.kt.kpi.fixreport.util;
+
+import com.kt.kpi.fixreport.model.DwFactDamageDevice;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthAssess;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthDefenTrial;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthPwZysbtj;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthXlpbfzdytj;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthYxzb;
+import com.kt.kpi.fixreport.model.DwFactGenFault;
+import com.kt.kpi.fixreport.model.MidFault;
+/*
+ * 注册实体类
+ * 
+ */
+public class EntityFactory {
+    private  String className;
+    Object obj =null;
+    public Object getObj() {
+		return obj;
+	}
+	public void setObj(Object obj) {
+		this.obj = obj;
+	}
+	public String getClassName() {
+			return className;
+		}
+		public void setClassName(String className) {
+			this.className = className;
+		}
+		
+	public	EntityFactory(String Name){
+			this.className=Name;
+			factoryEntity();
+		}
+	//工厂方法产生实体类---注册实体类
+	public Object factoryEntity(){				
+		if("MidFault".equals(className))
+		 obj =new MidFault();
+		else if("DwFactGddwMonthDefenTrial".equals(className))
+			 obj =new DwFactGddwMonthDefenTrial();
+		else if("DwFactGddwMonthXlpbfzdytj".equals(className))
+			 obj =new DwFactGddwMonthXlpbfzdytj();//表5：10kV线路、配变负载和电压情况统计	
+		else if("DwFactGddwMonthPwZysbtj".equals(className))
+			 obj =new DwFactGddwMonthPwZysbtj();
+		else if("DwFactDamageDevice".equals(className))		
+			 obj =new DwFactDamageDevice();			
+		else if("DwFactGddwMonthPwZysbtj".equals(className))		
+		     obj =new DwFactGddwMonthPwZysbtj();
+		else if("DwFactGddwMonthAssess".equals(className))		
+			 obj =new DwFactGddwMonthAssess();
+		else if("DwFactGddwMonthYxzb".equals(className))		
+			 obj =new DwFactGddwMonthYxzb();
+		else if("DwFactGenFault".equals(className))		
+			 obj =new DwFactGenFault();
+		return obj ;
+	}
+}

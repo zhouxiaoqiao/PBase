@@ -1,0 +1,79 @@
+ eclipse开发环境不能识别 jsp,js,sql时 需安装插件
+   在Eclipse中菜单help选项中选择install new software选项， 在work with 栏中输入   http://download.eclipse.org/releases/ganymede/
+一.数据库地址配置乱码处理
+1.mysql乱码处理在mysql安装文件my.ini修改 2个位置
+default-character-set=utf8
+2.hibernate配置
+	<prop key="hibernate.connection.useUnicode">true</prop>
+				<prop key="hibernate.connection.characterEncoding">UTF-8</prop>
+				Windows
+3.修改表字符编码 utf8				
+4.重启mysql
+　　1.点击“开始”->“运行”(快捷键Win+R)。
+
+　　2.启动：输入 net stop mysql
+
+　　3.停止：输入 net start mysql
+5.数据库地址配置
+    查看:config.properties	
+    			
+二.远程访问mysql需执行语句				
+ grant all privileges on *.* to 'root'@'%' identified by 'root123' with grant  option;
+ FLUSH PRIVILEGES;报表开发
+ 
+ 三.birt  
+  1.birt
+	    将birt-charts\DeploymentRuntime\ChartEngine下的所有jar文件复制到Tomcat的common\lib下面。
+	    将birt-charts\DeploymentRuntime\chart-viewer-sample.war\WEB-INF\lib下的所有文件复制到 工程名\WEB-INF\lib下面。
+	    创建工程时需要导入tomcat/lib下所有jar包	.
+	    注意:birt-runtime与 birt-charts版本一致,本程序用的birt版本是3.7.2	 
+  2. JVM内存设置,报错:java.lang.OutOfMemoryError: Java heap space
+	     打开eclipse  window－preferences－Java －Installed JREs －Edit －Default VM Arguments    
+	     在VM自变量中输入：-Xmx1024m -Xms512m -Xmn32m -Xss16m 
+  3. 需要传递excute_sql参数,完整sql与基本的模板数据集相符
+   select tab_employee.name,tab_employee.job,tab_employee.age,tab_employee.status,tab_employee.join_time from tab_employee  where tab_employee.age="33"  
+ 	     
+  4.birt分页设置,在layout视图选中Table	属性栏中的Page Break,设置Page Break Interva大小(页面),就可以自动分页了
+  
+四.创建存储过程
+  drop procedure if exists test_proc;   
+  create procedure test_proc (IN  parameter  varchar(20))
+  READS SQL DATA  
+
+		begin	
+		 UPDATE  tab_employee set name=parameter where eid='1403678888072' ;
+		end;
+ 五.部署工程和birt 
+ 
+  3.Tomcat内存设置
+  3.1  在windows下打开Tomcat根目录下的bin文件夹，编辑catalina.bat
+	      修改为：set JAVA_OPTS= -Xms256m -Xmx512m
+  3.2  如果要在myeclipse中启动tomcat，上述的修改就不起作用了，可如下设置：
+       eclipse->preferences->myeclipse->servers->tomcat->tomcat×.×->JDK面板中的
+       Optional Java VM arguments中添加：
+       -Xms256m -Xmx512m -XX:PermSize=64M -XX:MaxPermSize=128m
+  3.3  linux下的tomcat：  
+             修改TOMCAT_HOME/bin/catalina.sh 
+             位置cygwin=false前。
+       JAVA_OPTS="-server -Xms256m -Xmx512m -XX:PermSize=64M -XX:MaxPermSize=128m"  
+  3.4  如果tomcat 5 注册成了windows服务，以services方式启动的，则需要修改注册表中的相应键值。 
+	     修改注册表HKEY_LOCAL_MACHINE\SOFTWARE\Apache Software Foundation\Tomcat Service Manager\Tomcat5\Parameters\Java，
+	     右侧的Options原值为
+	   -Dcatalina.home="C:\ApacheGroup\Tomcat 5.0"
+	   -Djava.endorsed.dirs="C:\ApacheGroup\Tomcat 5.0\common\endorsed"
+	   -Xrs
+	      加入 -Xms256m -Xmx512m 
+	      重起tomcat服务,设置生效
+    
+六.自动初始化数据库
+    注意:sec_menu表的最高父菜单需要将id=1690改成0
+  
+七.导入   styles/uediter/jsp/lib文件下的jar包
+   
+八.参考系统
+  帐号: ruvarxql  密码：xiao  
+  地址:http://hrm.ruvar.com/ （建议IE浏览器登录）
+  http://www.ruvar.com/product_hrm.htm 
+九.git操作
+  提交程序时不要提交 webRoot/WEB-INF/lib文件(jar包太大);所以先移出 ,提交或下载完毕后把lib文件移入;先项目清理然后项目刷新
+  上传下载地址:https://github.com/zhouxiaoqiao/PBase.git

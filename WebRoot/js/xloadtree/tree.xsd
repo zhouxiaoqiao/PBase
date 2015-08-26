@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://webfx.eae.net"
+xmlns="http://webfx.eae.net"
+elementFormDefault="qualified">
+
+<xs:element name="tree" type="treeType"/>
+
+<xs:complexType name="treeType">
+	<xs:sequence>
+		<xs:element name="tree" type="treeType" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:sequence>
+	<xs:attributeGroup ref="treeAttrGroup"/>
+</xs:complexType>
+
+<!-- 元素属性声明 -->
+<xs:attributeGroup name="treeAttrGroup">
+	<xs:attribute name="text" type="xs:string"/>
+	<xs:attribute name="src" type="xs:string"/>
+	<xs:attribute name="action" type="xs:string"/>
+	<xs:attribute name="icon" type="xs:string"/>
+	<xs:attribute name="open_icon" type="xs:string"/>
+	<xs:attribute name="target" type="xs:string"/>
+	<xs:attribute name="data" type="xs:string"/>
+</xs:attributeGroup>
+
+
+</xs:schema>

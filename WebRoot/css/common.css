@@ -1,0 +1,333 @@
+#leftspan,rightspan{
+    background-color:#eeeeee;
+    border:1px solid #33ccff;
+    height:400px;
+}
+#leftspan{
+    width:180px;
+    float:left;
+}
+.a12b
+{
+	font-size: 12px;
+	font-weight: bold;
+	color: #425EA7;
+}
+.a12
+{
+	font-size: 12px;
+	color: #3253A7;
+}
+.line
+{
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #A0B0D5;
+}
+body
+{
+	margin: 0px;
+	font-size: 12px;
+}
+.FullWidth
+{
+	width: 100%;
+}
+.h1
+{
+	text-align: center;
+	font-weight: bold;
+	font-size: small;
+}
+.h2
+{
+	text-align: center;
+	font-weight: bold;
+	font-size: medium;
+}
+.h3
+{
+	text-align: center;
+	font-weight: bold;
+	font-size: large;
+}
+.hcenter
+{
+	text-align: center;
+}
+
+/* �������� */
+.gt0
+{
+	border: solid 1px #173B71;
+	padding: 0px 4px 2px 4px;
+	font-size: 100%;
+	text-decoration: none;
+	color: #FFFFFF;
+}
+.gt1
+{
+	border: solid 1px #B8B8B8;
+	padding: 0px 4px 2px 4px;
+	background: #0069AF;
+	font-size: 100%;
+	text-decoration: none;
+	color: #FFFFFF;
+}
+.gtsep
+{
+	font: 65% Verdana;
+	color: #B8B8B8;
+	padding: 0px 1px 2px 1px;
+}
+.CommonListTable
+{
+	border-right: #61c0ff 1px solid;
+	border-top: #61c0ff 1px solid;
+	border-left: #61c0ff 1px solid;
+	color: #000000;
+	border-bottom: #61c0ff 1px solid;
+	background-color: #f4fbff;
+	width: 90%;
+}
+.CommonListTable100
+{
+	border-right: #61c0ff 1px solid;
+	border-top: #61c0ff 1px solid;
+	border-left: #61c0ff 1px solid;
+	color: #000000;
+	border-bottom: #61c0ff 1px solid;
+	background-color: #f4fbff;
+	width: 100%;
+}
+.CommonListTable40
+{
+	border-right: #61c0ff 1px solid;
+	border-top: #61c0ff 1px solid;
+	border-left: #61c0ff 1px solid;
+	color: #000000;
+	border-bottom: #61c0ff 1px solid;
+	background-color: #f4fbff;
+	width: 890;
+	height: 74;
+}
+.HomeListTable
+{
+	border-right: #61c0ff 1px solid;
+	border-top: #61c0ff 1px solid;
+	border-left: #61c0ff 1px solid;
+	color: #000000;
+	border-bottom: #61c0ff 1px solid;
+	background-color: #f4fbff;
+	width: 80%;
+}
+.CommonListTableNoWidth
+{
+	border-right: #61c0ff 1px solid;
+	border-top: #61c0ff 1px solid;
+	border-left: #61c0ff 1px solid;
+	color: #000000;
+	border-bottom: #61c0ff 1px solid;
+	background-color: #f4fbff;
+}
+.CommonListHeader
+{
+	text-align: center;
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	background-color:  #173B71;
+	color: #FFFFFF;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 110%;
+	font-weight: bold;
+}
+.CommonListLeft
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	text-align: right;
+	font-weight: normal;
+	width: 20%;
+}
+.CommonListLeftBold
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 120%;
+	font-weight: bold;
+	text-align: right;
+	width: 20%;
+}
+.CommonListLeftNoWidth
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 14;
+	font-weight: normal;
+	text-align: right;
+}
+.CommonListRightNoWidth
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	font-weight: normal;
+	text-align: left;
+}
+.CommonListCell
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	font-weight: normal;
+	text-align: left;
+}
+.CommonListCenter
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	font-weight: normal;
+	text-align: center;
+}
+.CommonListRight
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	font-weight: normal;
+	text-align: left;
+}
+.CommonListLineItem
+{
+	color: #333333;
+	background-color:#F7F6F3;
+}
+.CommonListLineAlternating
+{
+	color:#284775;
+	background-color:White;
+}
+.HomeHeader
+{
+	text-align: Left;
+	padding: 2px;
+	border-style: solid;
+	border-width: 1px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	background-color:  #cccccc;
+	color: #000000;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 110%;
+	font-weight: bold;
+}
+.HomeListRight
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	background-color:  #DCDCDC;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	text-align: left;
+}
+.HomeListLeft
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	background-color:  #DCDCDC;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	text-align: right;
+}
+.HomeListCenter
+{
+	padding: 4px;
+	border-style: solid;
+	border-width: 1px;
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-color: #eeeeee;
+	background-color:  #DCDCDC;
+	color: #333333;
+	font-family: Tahoma, Arial, Helvetica;
+	font-size: 100%;
+	text-align: center;
+}
+.MessageWarning
+{
+	font-size: 110%;
+	font-weight: bold;
+	color:Red;
+}
+.SaveComplete
+{
+	display:inline-block;
+	background-color:CornflowerBlue;
+	width:400px;
+}
+.SaveWarning
+{
+	display:inline-block;
+	background-color: Red;
+	width:400px;
+}

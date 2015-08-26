@@ -1,0 +1,84 @@
+.editWin {
+	width: 500px;
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0px 0px 5px 10px;
+	opacity: 0.8;
+	position: absolute;
+	left: 0;
+	top: 0;
+	BORDER-RIGHT: 3px outset;
+	BORDER-TOP: 3px outset;
+	BORDER-LEFT: 3px outset;
+	BORDER-BOTTOM: 3px outset;
+	display: none
+}
+
+.editWin .ewTop {
+	height: 20px;
+	width: 95%;
+	font-size: 20px;
+	background: #F0FFFF;
+	cursor: move
+}
+
+.editWin .ewContent {	
+	width: 100%;
+	border-radius: 5px;
+	background: white
+}
+
+.findWin {
+	width: 250px;
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0px 0px 5px 10px;
+	opacity: 0.8;
+	position: absolute;
+	left: 0;
+	top: 0;
+	BORDER-RIGHT: 3px outset;
+	BORDER-TOP: 3px outset;
+	BORDER-LEFT: 3px outset;
+	BORDER-BOTTOM: 3px outset;
+	display: none
+}
+
+.findWin .fwTop {
+	height: 20px;
+	width: 90%;
+	font-size: 20px;
+	background: #F0FFFF;
+	cursor: move
+}
+
+.findWin .fwContent {	
+	width: 100%;
+	border-radius: 5px;
+	background: white;
+}
+ 
+ table.imagetable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #999999;
+	border-collapse: collapse;
+}
+table.imagetable th {
+	background:#b5cfd2 url('/image/cell-blue.jpg');
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #999999;
+}
+table.imagetable td {
+	background:#dcddc0 url('/image/cell-grey.jpg');
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #999999;
+}
+ 
+ 

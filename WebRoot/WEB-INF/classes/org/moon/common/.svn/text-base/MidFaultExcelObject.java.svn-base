@@ -1,0 +1,822 @@
+package com.kt.kpi.fixreport.util;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.kt.kpi.fixreport.model.DwFactGddwMonthEquipTrial;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthLowPressDev;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthMainDevice;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthMainDevstat;
+import com.kt.kpi.fixreport.model.MidFault;
+import com.kt.kpi.framework.dao.GeneDao;
+@Service
+public class MidFaultExcelObject {
+	@Autowired
+	private GeneDao geneDao;
+	@Autowired
+	private SelectOperate soService;		
+	@Autowired
+	private ExcelManageOperate excelService;
+	@Autowired
+	private ClientDataPro	clientDataPro;
+	private static Logger logger = Logger.getLogger(MidFaultExcelObject.class);
+
+	public List getMidObjectList(Sheet sheet,String deptId,String userId) throws Exception{
+	    List errList=new ArrayList();	
+	    List midFaultList=new ArrayList<MidFault>();
+	    midFaultList.add("success");
+		errList.add("unsuccess");
+		try{
+		//按名字取
+		int rows=excelService.getFactEndRow(sheet);		
+		//前面4行是表头
+		if(rows<=3){
+			throw new Exception("EXCEL模板有问题，导出的模板前3行不可修改，请检查");
+		}		
+		boolean isCrrected = true;//数据是否合法标志
+		Cell cell=null;
+		int startReadRow=0;
+		String xuhao=null;
+		for(int r=0;r<rows;r++){
+			if(sheet.getRow(r).getCell(0)!=null){
+				xuhao=sheet.getRow(r).getCell(0).getStringCellValue();
+			}			
+			if(xuhao!=null)xuhao=xuhao.trim();
+			else continue ;			
+			if(xuhao.contains("序号")){
+				startReadRow=r+1;
+				break;
+			}			
+			if(xuhao.contains("填报单位")){
+				startReadRow=r+3;//特定的excel格式
+				break;
+			}
+		}
+		int col_length=0;
+		
+		for(int index=startReadRow;index<=rows;index++){
+			Row row=sheet.getRow(index);
+			isCrrected = true;				
+			//取事实值
+			String factStr="";
+			MidFault dlc=new MidFault();
+			col_length=excelService.getFactEndCol(sheet, index);
+			for(int j=0;j<col_length;j++){		
+				String factValue="";
+					cell=row.getCell(j);					
+					try{
+						if(j==col_length-1)	//备注							
+							   factValue=excelService.getImportExcept(errList,cell,null,index,j);
+							else if(j==2||j==20)//日期
+								 factValue=excelService.getImportExcept(errList,cell,"Date",index,j);
+							else 
+								factValue=excelService.getImportExcept(errList,cell,"String",index,j);
+						switch(j){
+						case 1:			
+						     List dept=excelService.getdeptByExcleName(factValue, deptId);
+						     if(dept.size()==2){
+						    	 dlc.setDEPT_ID(dept.get(0).toString());  
+							 	 dlc.setD_GDDW_UNIT(dept.get(0).toString()); 
+							 	 dlc.setDEPT_NAME(dept.get(1).toString());   	
+						     }
+						   else {
+							   errList.clear();
+							   if(dept.size()==1)
+							     errList.add(dept.get(0));
+							   else 
+								   errList.add(dept.get(2));
+						    	return errList ;
+						   }						 
+							 break;					         					
+						case 2:			                        
+						    dlc.setHAPPEN_DATE(this.StringChangDate(factValue.substring(0, 10))); 	
+							break;                   			    							                         					
+						case 3:	                            
+						 	dlc.setPOWOFF_TIME(factValue.substring(11, 19)); 	
+							break;					         					
+						case 4:	                            
+					  	    dlc.setPOWERON_TIME(factValue.substring(11, 19)); 
+							break;                   					
+						case 5:		                          
+						 dlc.setLINE_NAME(factValue);  			
+							break;	
+							
+						case 6:	                            
+							 dlc.setF_VOLTAGE(factValue); 				
+								break;  	
+						case 7:	                            
+						 dlc.setTR_CAUSE(soService.getFaultClassExcel(factValue)); 				
+							break;  
+						case 8:	     //增加缺陷发现手段												
+							  dlc.setF_DEFECT_WAY(soService.getDefectWayExcel(factValue));  	
+								break;	
+						case 9:	                            
+						   dlc.setTR_DESCRIBE(factValue);  	
+							break;	
+						//变电站出线开关跳闸	
+						case 10:	                            
+						  dlc.setTRIP(soService.getYesNo(factValue)); 					
+							break;                   					
+						case 11:	                            
+						dlc.setPROTECT_TYPE(soService.getProtectTypeExcel(factValue));			
+							break;					         					
+						case 12:                            
+							 dlc.setMATCH_SUC(soService.getMatchSucExcel(factValue)); 		
+							break;  							
+							//线路上分段、分支开关跳闸						
+						case 13:	                            
+							  dlc.setF_LINE_TRIP(soService.getYesNo(factValue)); 					
+								break;                   					
+						case 14:	                            
+							dlc.setF_LINE_PRO_TYPE(soService.getProtectTypeExcel(factValue));			
+								break;					         					
+						case 15:                            
+								 dlc.setF_LINE_MATCH_SUC(soService.getMatchSucExcel(factValue)); 		
+								break;   																
+						case 16:	                          
+						    dlc.setHAPPEN_LOCATION(soService.getHappenLocationExcel(factValue));  
+							break;					         					
+						case 17:  //由于单元格合并
+							 dlc.setDAMAGE_DEVICE(soService.getDamageDeviceExcel(factValue)); 
+							break;                   					
+						case 18: 
+							 dlc.setDEVICE_TYPE(factValue);	  
+							 break;					         					
+						case 19: 
+						     dlc.setDEVICE_FACTORY(factValue);	
+							 break;                   												                         					
+						case 20: 
+						     dlc.setRUN_DATE(factValue.substring(0, 10));  			
+							break;					         					
+						case 21:
+							 dlc.setRUN_ONEYEARS(soService.getYesNo((factValue)));		
+							 break;                   					
+						case 22:
+							 dlc.setTESTDEVICE_DEPT(factValue);
+							 break;					                  
+						case 23:	                          
+						    dlc.setDESC_REMARK(factValue);  		
+							break;                            
+
+						}
+
+					}catch(Exception e){
+
+						e.printStackTrace();
+					}
+				}
+			 dlc.setSTATE("3");	
+			 dlc.setCreatTime(this.getSysDate());
+			 clientDataPro.setObjectStrKey(dlc,"setCreatUserid",userId);
+			 midFaultList.add(dlc)	;
+		
+		}
+
+		}catch(Exception e){
+			//logger.error(e);
+			e.printStackTrace();
+			throw e;
+		}
+	   if(errList.size()>1){
+	    	  midFaultList.clear();
+				return errList;
+			}
+		return midFaultList;
+	}
+	public List getLowObjectList(Sheet sheet,String deptId,String UPD_USERID) throws Exception{
+    List errList=new ArrayList();	
+    List midFaultList=new ArrayList<DwFactGddwMonthLowPressDev>();
+    midFaultList.add("success");
+	errList.add("unsuccess");
+	try{
+	//按名字取
+	//获取真正有数据行数	
+	int rows=excelService.getFactEndRow(sheet);
+	//前面4行是表头
+	if(rows<=3){
+		throw new Exception("EXCEL模板有问题，导出的模板前3行不可修改，请检查");
+	}		
+	boolean isCrrected = true;//数据是否合法标志
+	Cell cell=null;
+	int startReadRow=0;
+	String xuhao=null;
+	for(int r=0;r<rows;r++){
+		if(sheet.getRow(r).getCell(0)!=null){
+			xuhao=sheet.getRow(r).getCell(0).getStringCellValue();
+		}			
+		if(xuhao!=null)xuhao=xuhao.trim();
+		else continue ;			
+		if(xuhao.contains("序号")){
+			startReadRow=r+3;
+			break;
+		}			
+		if(xuhao.contains("填报单位")){
+			startReadRow=r+4;//特定的excel格式
+			break;
+		}
+	}
+
+	int col_length=0;
+	
+	for(int index=startReadRow;index<=rows;index++){
+		Row row=sheet.getRow(index);
+		isCrrected = true;				
+		//取事实值
+		DwFactGddwMonthLowPressDev dlc=new DwFactGddwMonthLowPressDev();		
+		col_length=excelService.getFactEndCol(sheet, index);
+		for(int j=0;j<col_length;j++){		
+			String factValue="";
+				cell=row.getCell(j);
+				long numberL=0;
+				try{
+				  if(j==1||j==0)							
+						  factValue=excelService.getImportExcept(errList,cell,null,index,j);				
+					else if(!(j==15||j==20)) {
+						factValue=excelService.getImportExcept(errList,cell,"Double",index,j);
+						numberL=excelService.excelParseNumber(factValue);
+					}
+						
+						switch(j){
+					case 	1	:	
+				     List dept=excelService.getdeptByExcleName(factValue, deptId);
+				     if(dept.size()==2){
+					 	 dlc.setD_GDDW_UNIT(dept.get(0).toString()); 				 
+				       }
+				      else {
+				    	   errList.clear();
+					       if(dept.size()==1)
+					         errList.add(dept.get(0));
+					        else 
+						      errList.add(dept.get(2));
+					        return errList ;
+				             }						 
+						 break;
+				
+					case 	2	:					          
+					               dlc.setSWITH(numberL) ;	
+					               break;						             
+					case 	3	:  //factValue=factValue.substring(0, factValue.length()-4);
+						           dlc.setUNPOWER_BOX(numberL)             	;
+					               break;
+					case 	4	:  //factValue=factValue.substring(0, factValue.length()-4);
+						           dlc.setUNPOWER_TANK(numberL)            	;					              
+					               break;					
+					case 	5	: // factValue=factValue.substring(0, factValue.length()-4);
+						           dlc.setTOTAL_SWITH_BOX(numberL) ;					               
+					                 break;
+					case 	6	:	 //factValue=factValue.substring(0, factValue.length()-4);
+					                 dlc.setLINE_BOX(numberL)             	;
+                                      break;                             
+					case 	7	:	dlc.setLINE_UNPOWER_CAPACITY(numberL)   	;	break;
+					case 	8	:	dlc.setROOM_UNPOWER_CAPACITY(numberL)   	;	break;
+					case 	9	:	dlc.setSPECIAL_UNPOWER_CAPACITY(Double.parseDouble(factValue))	;	break;
+					case 	10	:	dlc.setLINE_NUM(numberL)               	;	break;
+					case 	11	:	dlc.setUNCOVER_LINE3(numberL)          	;	break;
+					case 	12	:	dlc.setTWINE3(numberL)                 	;	break;
+					case 	13	:	dlc.setPLASTIC_LINE3(numberL)           	;	break;
+					case 	14	:	dlc.setCABLE3(numberL)                 	;	
+					                break;
+					case 	15	:	dlc.setAMOUNT3(dlc.getCABLE3()+dlc.getPLASTIC_LINE3()) 	;	break;
+					case 	16	:	dlc.setUNCOVER_LINE(numberL)           	;	break;
+					case 	17	:	dlc.setTWINE(numberL)                 	;	break;
+					case 	18	:	dlc.setPLASTIC_LINE(numberL)           	;	break;
+					case 	19	:	dlc.setCABLE(numberL)                	;	break;
+					case 	20	:	dlc.setAMOUNT(dlc.getPLASTIC_LINE()+dlc.getCABLE())    	;	break;
+					case 	21	:	dlc.setGENER_CAPACITY(numberL)          	;	break;
+					case 	22	:	dlc.setSPECIAL_CAPACITY(numberL)        	;	break;
+				
+					}			
+			   }
+			 catch(Exception e){
+						//logger.error(e);
+						e.printStackTrace();
+						throw e;
+			  }	
+			 			
+		   }
+		dlc.setSTATE(3L);
+		dlc.setCreatUserid(UPD_USERID);
+		String year=String.valueOf(excelService.getYearMon(this.getSysDate()).get("year"));
+		dlc.setD_YEAR(year);
+		String mon=String.valueOf(excelService.getYearMon(this.getSysDate()).get("mon"));
+		dlc.setD_MONTH(mon);
+		//dlc.setUpdTime(this.getSysDate());
+		dlc.setDO_DATE(excelService.getStaticTime(sheet));
+		dlc.setCreatTime(this.getSysDate());
+		dlc.setSTATIC_TIME(excelService.getStaticTime(sheet));		
+		midFaultList.add(dlc);
+	    }
+	}
+      catch(Exception e){
+		//logger.error(e);
+		e.printStackTrace();
+		throw e;
+	  }finally{
+		
+	}
+ if(errList.size()>1){
+	    	  midFaultList.clear();
+				return errList;
+			}     if(errList.size()>1){
+		    	  midFaultList.clear();
+					return errList;
+				}	  
+	return midFaultList;	
+   }
+  
+	@SuppressWarnings("unchecked")
+	public List getEquipObjectList(Sheet sheet,String deptId,String UPD_USERID) throws Exception{
+	    List errList=new ArrayList();	
+	    List midFaultList=new ArrayList<DwFactGddwMonthEquipTrial>();
+	    midFaultList.add("success");
+		errList.add("unsuccess");
+		try{
+			//获取真正有数据行数	
+		int rows=excelService.getFactEndRow(sheet);
+		
+		//前面4行是表头
+		if(rows<=3){
+			throw new Exception("EXCEL模板有问题，导出的模板前3行不可修改，请检查");
+		}		
+		boolean isCrrected = true;//数据是否合法标志
+		Cell cell=null;
+		int startReadRow=0;
+		String xuhao=null;
+		for(int r=0;r<rows;r++){
+			if(sheet.getRow(r)!=null){
+			   if(sheet.getRow(r).getCell(0)!=null){
+				xuhao=sheet.getRow(r).getCell(0).getStringCellValue();
+			   }
+			 }
+			else continue;
+			if(xuhao!=null)xuhao=xuhao.trim();
+			else continue ;			
+			if(xuhao.contains("序号")){
+				startReadRow=r+2;
+				break;
+			}			
+			if(xuhao.contains("填报单位")){
+				startReadRow=r+3;//特定的excel格式
+				break;
+			}
+		}
+		int col_length=0;
+		for(int index=startReadRow;index<=rows;index++){
+			Row row=sheet.getRow(index);
+			isCrrected = true;				
+			//取事实值
+			String factStr="";
+			col_length=excelService.getFactEndCol(sheet, index);
+			DwFactGddwMonthEquipTrial dlc=new DwFactGddwMonthEquipTrial();
+			for(int j=0;j<col_length;j++){		
+				String factValue="";
+					cell=row.getCell(j);					
+					try{
+						if(j==col_length-1)	//备注							
+							   factValue=excelService.getImportExcept(errList,cell,null,index,j);
+							else if(j==2||j==10)//日期
+								 factValue=excelService.getImportExcept(errList,cell,"Date",index,j);
+							else 
+								factValue=excelService.getImportExcept(errList,cell,"String",index,j);	
+					 long lnum=0l;
+						switch(j){
+						case 	1	:
+					     List dept=excelService.getdeptByExcleName(factValue, deptId);
+					     if(dept.size()==2){
+						 	 dlc.setD_GDDW_UNIT(dept.get(0).toString()); 				 
+					       }
+					      else {
+					    	   errList.clear();
+						       if(dept.size()==1)
+						         errList.add(dept.get(0));
+						        else 
+							      errList.add(dept.get(2));
+						        return errList ;
+					             }						 
+							 break;
+						case	2	:dlc.setDO_DATE(this.StringChangDate(factValue.substring(0,10)));break;						
+						case	3	:dlc.setSTATION_NAME(factValue);break;
+						case	4	:dlc.setQUESTION_TYPE(soService.getFaultClassExcel(factValue));break;
+						case	5	:dlc.setSTATE_COMMENT(factValue);break;
+						case	6	:dlc.setTRIAL_RESULT(factValue);break;
+						case	7	:dlc.setEQUIP_TYPE(soService.getDeviceTypeExcel(factValue,"K1"));break;
+						case	8	:dlc.setEQUIP_NO(factValue);break;
+						case	9	:dlc.setSELLER(factValue);break;
+						case	10	:dlc.setRUN_DATE(this.StringChangDate(factValue.substring(0,10)));break;
+						case	11	:dlc.setEQUIP_CONN_DEPT(factValue);break;				
+						case	12	:dlc.setREMARK(factValue);break;			
+						}
+										
+				   }
+				 catch(Exception e){
+							//logger.error(e);
+							e.printStackTrace();
+							 midFaultList.clear();
+							 errList.add("异常");
+							return errList;
+							
+				  }	
+				 
+				
+			   }
+			dlc.setSTATE(3L);
+			dlc.setCreatUserid(UPD_USERID);
+			dlc.setUpdUserid(UPD_USERID);
+			String year=String.valueOf(excelService.getYearMon(this.getSysDate()).get("year"));
+			dlc.setD_YEAR(year);
+			String mon=String.valueOf(excelService.getYearMon(this.getSysDate()).get("mon"));
+			dlc.setD_MONTH(mon);
+			dlc.setCreatTime(this.getSysDate());
+			//dlc.setUpdTime(this.getSysDate());
+			dlc.setDO_DATE(excelService.getStaticTime(sheet));
+			midFaultList.add(dlc);
+		    }
+		}
+	      catch(Exception e){
+			//logger.error(e);
+			e.printStackTrace();
+			 midFaultList.clear();
+			 errList.add("异常");
+				return errList;
+		  }finally{
+			
+		}		  
+	   if(errList.size()>1){
+		    	  midFaultList.clear();
+					return errList;
+				} 
+		return midFaultList;	
+	   }
+	
+	public List getMainDeviceObjectList(Sheet sheet,String deptId,String UPD_USERID) throws Exception{
+	    List errList=new ArrayList();	
+	    List midFaultList=new ArrayList<DwFactGddwMonthMainDevice>();
+	    midFaultList.add("success");
+		errList.add("unsuccess");
+		try{
+		//获取真正有数据行数	
+		int rows=excelService.getFactEndRow(sheet);		
+		//前面4行是表头
+		if(rows<=3){
+			throw new Exception("EXCEL模板有问题，导出的模板前3行不可修改，请检查");
+		}		
+		boolean isCrrected = true;//数据是否合法标志
+		Cell cell=null;
+		int startReadRow=0;
+		String xuhao=null;
+		for(int r=0;r<rows;r++){
+			if(sheet.getRow(r).getCell(0)!=null){
+				xuhao=sheet.getRow(r).getCell(0).getStringCellValue();
+			}			
+			if(xuhao!=null)xuhao=xuhao.trim();
+			else continue ;			
+			if(xuhao.contains("序号")){
+				startReadRow=r+2;
+				break;
+			}			
+			if(xuhao.contains("填报单位")){
+				startReadRow=r+4;//特定的excel格式
+				break;
+			}
+		}
+		int col_length=0;
+		for(int index=startReadRow;index<=rows;index++){
+			Row row=sheet.getRow(index);
+			isCrrected = true;				
+			//取事实值
+			String factStr="";
+			col_length=excelService.getFactEndCol(sheet, index);
+			DwFactGddwMonthMainDevice dlc=new DwFactGddwMonthMainDevice();
+			for(int j=0;j<col_length;j++){		
+				String factValue="";
+					cell=row.getCell(j);					
+					try{
+						if(j==1)factValue=excelService.getImportExcept(errList,cell,null,index,j);
+						else if(1<j&&j<16&&j!=4&&j!=7&&j!=10&&j!=12&&j!=13)	//数字							
+						    factValue=excelService.getImportExcept(errList,cell,"Double",index,j);
+					if (factValue==null||"".equals(factValue))continue;//可能是超出列
+						long lnum=0l;
+						switch(j){
+						case 	1	:	
+					     List dept=excelService.getdeptByExcleName(factValue, deptId);
+					     if(dept.size()==2){
+						 	 dlc.setD_GDDW_UNIT(dept.get(0).toString()); 				 
+					       }
+					      else {
+					    	   errList.clear();
+						       if(dept.size()==1)
+						         errList.add(dept.get(0));
+						        else 
+							      errList.add(dept.get(2));
+						        return errList ;
+					             }						 
+							 break;                       
+	case	2	:
+		  factValue=factValue.substring(0, factValue.length()-2);
+		   dlc.setMIX_TRIAL_NUM(Long.parseLong(factValue));break; 
+	case	3	:
+		factValue=factValue.substring(0, factValue.length()-2);
+		dlc.setMID_SWITH_BOX_NUM(Long.parseLong(factValue));break; 
+	case	5	:
+		factValue=factValue.substring(0, factValue.length()-2);
+		dlc.setMID_HALF_ISOLAT_BOX_NUM(Long.parseLong(factValue));break; 
+	case	6	:
+		 factValue=factValue.substring(0, factValue.length()-2);
+		 dlc.setMID_ISOLAT_BOX_NUM(Long.parseLong(factValue));break; 
+	case	8	:
+		factValue=factValue.substring(0, factValue.length()-2);
+		dlc.setMID_PILLAR_SWITH_NUM(Long.parseLong(factValue));break; 
+	case	9	:
+		 factValue=factValue.substring(0, factValue.length()-2);
+		dlc.setMID_PILLAR_OVERLOAD_SWITH_NUM (Long.parseLong(factValue));break; 
+	case	11	:
+		 factValue=factValue.substring(0, factValue.length()-2);
+		dlc.setMID_PILLAR_ISOLAT_NUM (Long.parseLong(factValue));break; 
+	case	14	:
+		 factValue=factValue.substring(0, factValue.length()-2);
+		dlc.setMID_PILLAR_LIQUATE_NUM(Long.parseLong(factValue));break; 
+	case	15	:
+		 factValue=factValue.substring(0, factValue.length()-2);
+		dlc.setCABLE_SELF_NUM (Long.parseLong(factValue));break; 
+						}					
+			
+				   }
+				 catch(Exception e){
+							//logger.error(e);
+							e.printStackTrace();
+							throw e;
+				  }	
+				 
+				
+			   }
+			dlc.setSTATE(3L);
+			dlc.setCreatUserid(UPD_USERID);
+			dlc.setUpdUserid(UPD_USERID);
+			dlc.setDO_DATE(this.getSysDate());
+			String year=String.valueOf(excelService.getYearMon(this.getSysDate()).get("year"));
+			dlc.setD_YEAR(year);
+			String mon=String.valueOf(excelService.getYearMon(this.getSysDate()).get("mon"));
+			dlc.setD_MONTH(mon);
+			dlc.setCreatTime(this.getSysDate());
+			//dlc.setUpdTime(this.getSysDate());
+			dlc.setDO_DATE(excelService.getStaticTime(sheet));
+			midFaultList.add(dlc);
+		    }
+		}
+	      catch(Exception e){
+			//logger.error(e);
+			e.printStackTrace();
+			throw e;
+		  }finally{
+			
+		}
+		if(errList.size()>1){
+		    	  midFaultList.clear();
+					return errList;
+			}	  
+		return midFaultList;	
+	   }
+	
+	
+	public List getMainDefenObjectList(Sheet sheet,String deptId,String UPD_USERID) throws Exception{
+	    List errList=new ArrayList();	
+	    List midFaultList=new ArrayList<DwFactGddwMonthMainDevstat>();
+	    midFaultList.add("success");
+		errList.add("unsuccess");
+		try{
+		//获取真正有数据行数	
+		int rows=excelService.getFactEndRow(sheet);		
+		//前面4行是表头
+		if(rows<=3){
+			throw new Exception("EXCEL模板有问题，导出的模板前3行不可修改，请检查");
+		}		
+		boolean isCrrected = true;//数据是否合法标志
+		Cell cell=null;
+		int startReadRow=0;
+		String xuhao=null;
+		for(int r=0;r<rows;r++){
+			if(sheet.getRow(r).getCell(0)!=null){
+				xuhao=sheet.getRow(r).getCell(0).getStringCellValue();
+			}			
+			if(xuhao!=null)xuhao=xuhao.trim();
+			else continue ;			
+			if(xuhao.contains("序号")){
+				startReadRow=r+2;
+				break;
+			}			
+			if(xuhao.contains("填报单位")){
+				startReadRow=r+4;//特定的excel格式
+				break;
+			}
+		}
+		int col_length=0;
+		for(int index=startReadRow;index<=rows;index++){
+			Row row=sheet.getRow(index);
+			isCrrected = true;				
+			//取事实值
+			String factStr="";
+			col_length=excelService.getFactEndCol(sheet, index);
+			DwFactGddwMonthMainDevstat dlc=new DwFactGddwMonthMainDevstat();
+			for(int j=0;j<col_length;j++){		
+				String factValue="";
+					cell=row.getCell(j);					
+					try{
+						 if(j>=4)//数字
+								 factValue=excelService.getImportExcept(errList,cell,"Double",index,j);
+							else if(j==1||j==3)
+								factValue=excelService.getImportExcept(errList,cell,null,index,j);	
+					 long lnum=0l;
+						switch(j){
+						case 	1	:
+					     List dept=excelService.getdeptByExcleName(factValue, deptId);
+					     if(dept.size()==2){
+						 	 dlc.setD_GDDW_UNIT(dept.get(0).toString()); 				 
+					       }
+					      else {
+					    	   errList.clear();
+						       if(dept.size()==1)
+						         errList.add(dept.get(0));
+						        else 
+							      errList.add(dept.get(2));
+						        return errList ;
+					             }	
+							 break; 
+						case 	3	:
+							dlc.setTRAIL_DIM_ID(soService.getDefectWayExcel(factValue));break;  
+						case 	4	:
+							dlc.setSWITH(excelService.excelParseNumber(factValue));break;  
+						case 	5	:
+							dlc.setISOLAT_SWITH(excelService.excelParseNumber(factValue));break;  
+						case 	6	:
+							dlc.setHALF_ISOLAT_SWITH(excelService.excelParseNumber(factValue));break;  												
+						case 	7	:
+							dlc.setPILLAR_SWITH(excelService.excelParseNumber(factValue));break; 													
+						case 	8	:
+							dlc.setCOLD_CABLE_TERMINAL(excelService.excelParseNumber(factValue));break;  
+						case 	9	:
+							dlc.setHOT_CABLE_TERMINAL(excelService.excelParseNumber(factValue));break;  
+						case 	10	:
+							dlc.setCOLD_CABLE_TIEIN(excelService.excelParseNumber(factValue));break;  
+						case 	11	:
+							dlc.setHOT_CABLE_TIEIN(excelService.excelParseNumber(factValue));break;  
+			    		case 	12	:							
+							dlc.setCABLE_ANCON_TIEIN(excelService.excelParseNumber(factValue));break;  //CABLE_ANCON_TIEIN电缆肘型接头
+			    		case 	13	:							
+							dlc.setCABLE_SELF(excelService.excelParseNumber(factValue));break; 
+						case 	14	:							
+							dlc.setCONFIG_TRANSFORM(excelService.excelParseNumber(factValue));break;  
+
+						}					
+							
+				   }
+				 catch(Exception e){
+							//logger.error(e);
+							e.printStackTrace();
+							throw e;
+				  }	
+				 
+				
+			   }
+			dlc.setSTATE(3L);
+			dlc.setCreatUserid(UPD_USERID);
+			dlc.setUpdUserid(UPD_USERID);
+			dlc.setDO_DATE(this.getSysDate());
+			String year=String.valueOf(excelService.getYearMon(this.getSysDate()).get("year"));
+			dlc.setD_YEAR(year);
+			String mon=String.valueOf(excelService.getYearMon(this.getSysDate()).get("mon"));
+			dlc.setD_MONTH(mon);
+			dlc.setCreatTime(this.getSysDate());
+			//dlc.setUpdTime(this.getSysDate());
+			midFaultList.add(dlc);
+		    }
+		}
+	      catch(Exception e){
+			//logger.error(e);
+			e.printStackTrace();
+			throw e;
+		  }
+	      
+	     if(errList.size()>1){
+	    	  midFaultList.clear();
+				return errList;
+			}
+		return midFaultList;	
+	   }
+  /*
+	 * 字符转日期
+	 */
+
+	 private static Timestamp StringChangDate(String str){
+	      Timestamp ts=null;
+		  try{
+			  if(str!=null){
+				  str=str.trim();
+				 if(!"".equals(str)){
+				  java.sql.Date  sdt=java.sql.Date.valueOf(str); 
+				  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				  String time = df.format(sdt);
+				   ts = Timestamp.valueOf(time);
+			    }
+		     }
+			  else
+				  return null;
+
+		  }
+		  catch(Exception e){
+			  e.printStackTrace();
+		  }
+	    return ts ;
+	   }
+	/*
+ * 获取系统时间2011/4/15周小桥
+ */
+ private Timestamp getSysDate(){
+	
+		  Date sysdate=new Date();
+		  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		  String time = df.format(sysdate);
+		  Timestamp ts = Timestamp.valueOf(time);
+	  return ts;
+  }
+ /*
+  * 
+  * 两个字符窜数字相加
+  */
+ public double getAddStr(String str1,String str2){
+ 	   String str=null;
+ 	   if(str1==null||"".equals(str1)){
+ 		   str1="0";
+ 	   }
+ 	   if(str2==null||"".equals(str2)){
+ 		   str2="0";
+ 	   }
+ 	  double g=Double.parseDouble(str1)+Double.parseDouble(str2);
+        //str=String.valueOf(g);
+ 	   return g;
+     }
+
+ 
+ private String getCellValue(Cell cell,boolean isDigit) throws Exception{
+		String value="";	
+		switch(cell.getCellType()){	
+		case HSSFCell.CELL_TYPE_NUMERIC: //Cell.CELL_TYPE_NUMERIC:
+				//读取日期格式
+				if (HSSFDateUtil.isCellDateFormatted(cell)) {//日期类型
+					double d = cell.getNumericCellValue();
+					Date date = HSSFDateUtil.getJavaDate(d);
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					String time = df.format(date);
+					Timestamp ts = Timestamp.valueOf(time);
+					value=ts.toString();
+					value=value.substring(0, 19);
+				}else {//数字类型
+					//dataMap.put(headCodes[j], cell.getNumericCellValue());
+			    	value=String.valueOf(cell.getNumericCellValue());			
+				}
+			break;
+			
+		case Cell.CELL_TYPE_STRING:
+			//读取String
+			value=cell.getRichStringCellValue().toString();	
+			break;	
+		default:
+			
+			break;
+				
+				
+	    }
+		 Pattern p = Pattern.compile("^(-)?\\d+(\\.\\d+)?$");   
+	     Matcher matcher = p.matcher(value);
+	     if(!StringUtils.isEmpty(value)
+	    		 &&matcher.matches()){
+	    	 //保留小数的位数
+	    	 int scale=3;//默认保留3位
+	    	 BigDecimal big= new BigDecimal(value).setScale(scale, BigDecimal.ROUND_HALF_UP); 
+	    	 value=big.toString();
+	     }else{
+	    	 if(isDigit){
+	    	   throw new Exception("空的数据列");
+	    	 }else{
+	    		 ;
+	    	 }
+	     }
+		return value;
+	  }
+ 
+}

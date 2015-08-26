@@ -1,0 +1,57 @@
+@CHARSET "UTF-8";
+/*报表名称*/
+.title{
+  font-size:16px;
+  font-weight:bold;
+  color:#211FBD;
+  text-align:center;
+}
+ 
+/*表格通用样式*/
+.tables{
+ text-align:center;
+ line-height:25px;
+ font-size:14px;
+ margin: 0; 
+ border: 1px solid #99CCCC; 
+ padding: 1px; 
+ float: left;
+}
+/*表格第一行，注意不是表格的th，有些客户要求把合计行放到最上面*/
+.table-first-row{
+ color:#666666;
+ font-weight:normal;
+}
+/*表格正文*/
+.table-rows{
+ padding: 6px 4px 1px 4px; 
+ border-bottom: 1px solid #DDDDDD; 
+ color: #333333; 
+ vertical-align: middle;
+}
+/*表格的表格线*/
+.table-border{
+ border: 1px solid #DDDDDD; 
+ padding: 1px; 
+ float: left;
+}
+/*表格的th*/
+.table-th{
+ background: url(img/tableHeadBG.gif) repeat-x left top;
+ padding: 8px 4px 2px 4px; 
+ border-bottom: 1px solid #DDDDDD; 
+ font-weight: bold; 
+ color: #333333;
+ vertical-align: middle;
+}
+ 
+/*最后一列(几列之和、几列之差等运算)*/
+.table-last-column{
+ background-color:#E2EAF3;
+}
+/*最后一行(求统计等)*/
+.table-last-row{
+ background-color:#FFFFCC;
+ color: #333333; 
+ font-weight:bold;
+}

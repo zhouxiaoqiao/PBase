@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>选择年月</title>
+  <script type="text/javascript">
+  function addDateOption(object,dateType){
+        var selectObj =object;  
+        var now= new Date();   
+        var year=now.getYear();   
+        var month=now.getMonth()+1;
+        object.length=0;        
+      if(dateType=='year'){ 
+       for(var i=year-10;i<year+10;i++){
+           var op = window.document.createElement("option");          
+           op.value = i;                            
+           op.innerHTML =i+'年';
+           selectObj.appendChild(op);
+           if(i==year){
+                op.selected=true; 
+                } 
+               
+          }
+       }
+      else  if(dateType=='month'){
+          for(var i=1;i<13;i++){
+           var op = window.document.createElement("option"); 
+            if(i<10){
+               op.value ='0'+ i; 
+            }        
+           else     op.value = i;                            
+           op.innerHTML =i+'月';
+           selectObj.appendChild(op);
+            if(i==month){
+                op.selected=true; 
+                }
+          }
+      }
+  } 
+  function commitDate(){
+    year_mon=document.getElementById("_year").value+'-'+document.getElementById("_month").value;
+    window.returnValue=year_mon;
+
+    window.close();
+  }
+  
+  
+  function closeForm(){
+    window.returnValue='';
+    window.close();
+  } 
+  
+</script>
+</head>
+<body>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+  <td>
+  <select id="_year" onfocus="addDateOption(this,'year')">        	
+         <option value="0">请选择年</option>
+      </select>
+</td>	
+  <td>
+       <select id="_month" onfocus="addDateOption(this,'month')"> 
+          <option value="0">请选择月</option>       	
+      </select>
+    </td>
+  </tr>
+  <tr>
+  <td>
+  <input type='button' id="subm" onclick="commitDate();" style='width:50px'value='确定'>
+  </td>
+  <td>
+  <input type='button' id="cl" onclick="closeForm();" style='width:50px'value='清空'>
+  </td>
+  </tr>
+</table>
+
+
+</body>
+</html>

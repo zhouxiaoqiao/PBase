@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.22" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 2.6.2.r262_v20110209 Build &lt;2.6.2.v20110219-1842></property>
+    <property name="units">in</property>
+    <property name="layoutPreference">auto layout</property>
+    <styles>
+        <style name="report" id="2"/>
+        <style name="label" id="3"/>
+        <style name="text" id="4"/>
+        <style name="data" id="5"/>
+        <style name="table" id="6"/>
+        <style name="grid" id="7"/>
+        <style name="list" id="8"/>
+        <style name="image" id="9"/>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="10">
+            <property name="topMargin">1in</property>
+            <property name="leftMargin">1.25in</property>
+            <property name="bottomMargin">1in</property>
+            <property name="rightMargin">1.25in</property>
+            <page-header>
+                <grid id="11">
+                    <property name="width">100%</property>
+                    <column id="12"/>
+                    <row id="13">
+                        <cell id="14">
+                            <property name="fontSize">xx-large</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">center</property>
+                            <text id="15">
+                                <text-property name="content"><![CDATA[Title]]></text-property>
+                            </text>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="16">
+                    <property name="width">100%</property>
+                    <column id="17"/>
+                    <column id="18"/>
+                    <row id="19">
+                        <cell id="20">
+                            <text id="21">
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="22">
+                            <property name="textAlign">right</property>
+                            <text id="23">
+                                <text-property name="content"><![CDATA[Page:]]></text-property>
+                            </text>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <label id="24">
+            <text-property name="text">Congratulations, the BIRT Runtime has been installed successfully. </text-property>
+        </label>
+        <label id="25">
+            <text-property name="text">Thank you for choosing BIRT.</text-property>
+        </label>
+        <label id="26">
+            <text-property name="text">bnbn</text-property>
+        </label>
+    </body>
+</report>

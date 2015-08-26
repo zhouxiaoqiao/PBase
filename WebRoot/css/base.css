@@ -1,0 +1,126 @@
+@charset "utf-8";
+/* CSS design by */
+*{margin:0px; padding:0px;font-family: Arial,"宋体", Helvetica, sans-serif;color:#454545; word-break: break-all;font-size:12px;}
+
+
+
+.listbg{border:solid 1px #edd89d;  padding:15px;}
+
+/****data list***/
+.datalist          {border-collapse:collapse; width:100%;}
+.datalist th       {padding-left:3px;background:#ffde7b; font-weight:normal;line-height:24px;border:1px solid #BBD1E0;color:#000;text-align:left;}
+.datalist td       {padding-left:3px; border:1px solid #BBD1E0;line-height:20px;color:#000}
+.datalist thead td {color:#195077;background:#EEF4F9;font-weight:bold;}
+
+
+.white{color:#fff;}
+.LH20{line-height:20px;}
+.padding10{padding:10px;}
+
+.jstreeDiv{
+     
+     width:160px;
+     height:500px;
+     float:left;
+     overflow: auto;
+     
+     background: white;
+}
+
+.buttons{border:1px solid #6DA4C9;border-top:none;border-left:none;color:#3778A4;margin:0px 3px;background:#EEF4F9;
+		 height:20px;line-height:17px;cursor:pointer;}
+/*===================================================*/
+		.table-data{border-collapse:collapse;
+					border:2px solid #BBD1E0;
+					margin-top:10px;margin-bottom:5px;
+					text-align:center;
+		} <!-- 修饰页面中的表格 -->
+		.table-data tr,.table-data td{border:1px solid #BBD1E0;}
+		.table-data thead td{color:#195077;background:#EEF4F9;font-weight:bold;height:30px;}
+		
+/*===================================================*/		
+
+.daohang{
+	font-size:13px;
+	color: #6600FF;
+}
+
+.dangqian{
+	font-size:13px;
+}
+
+
+.calColor{color:green}
+.relColor{color:#FF00FF}
+.srcColor{color:#8000FF}
+
+a.open_new{font-weight:bold;color:#BC2049;margin-left:10px;}	
+
+a.open_new:hover{color:green;}
+
+
+
+<!-- *************************************      指标报告       ***************************************** -->
+.hr_1{color:#A6C9E2;height:1px;width:100%;text-align:left;}<!-- 分隔线 -->
+
+.font_color_1{color:#05548C;}
+.div_contain_btn{width:100%;height:40px;border:1px solid #BBD1E0;margin-top:1px;margin-left:1px;padding:5px 0px 2px 5px;}<!-- 放按钮的表格 -->
+.div_btn_shadow{border-bottom:2px solid #DDE4E8;margin-bottom:10px;margin-left:1px;}	
+	
+	
+	
+
+.table_report{border-collapse:collapse;border:1px solid #DDECF6;margin-left:10px;width:100%;}<!-- 盛放报告的表格 -->
+.table_report td{border:1px solid #DDECF6;padding:5px;}	
+.table_report textarea{width:100%;height:70px;}
+.table_report fieldset{width:100%;border:1px solid #7F9DB9;padding:0px 7px;margin-bottom:5px;}
+.table_report fieldset legend{color:#05548C;}
+.table_report fieldset table {border-collapse:collapse;border:1px solid #ffffff;margin-top:5px;margin-bottom:5px;}
+.table_report fieldset table td{border:1px solid #ffffff;padding-bottom:5px;vertical-align:text-top;}
+.table_report textarea,.table_report input{margin-top:3px;margin-bottom:3px;}
+
+.td_title{color:#05548C;width:90px;}<!---->
+.title_color{color:#05548C;}
+.a_report{color:purple;}
+.a_report:hover{color:red;text-decoration:none;}
+
+.table_report_layout{border-collapse:collapse;border:1px solid #A6C9E2;}
+.table_report_layout td{border:1px solid #A6C9E2;}
+
+.table_base_info{border-collapse:collapse;border:1px solid #DDECF6;width:95%;margin-top:20px;margin-bottom:20px;}
+.table_base_info td{border:1px solid #DDECF6;padding:5px;padding-bottom:10px;vertical-align:text-top;}
+
+
+<!-- ******************************************************************** -->
+
+
+.table_border_white{border-collapse:collapse;border:1px solid #fff;}<!-- 白色边框的表格 -->
+.table_border_white td{border:1px solid #fff;}
+
+.table_border_2{border-collapse:collapse;border:1px solid #DBE7F1;margin-left:1px;}<!-- 其他颜色边框的表格 -->
+.table_border_2 td{border:1px solid #DBE7F1;}
+
+
+.mid{text-align:center;}
+.padding_5px{padding:5px;}
+.padding_top_5px{padding-top:5px;}
+
+<!-- ***********************     对标管理 > 对标指标库    ************************* -->
+
+
+.kpi_vs_table{border-collapse:collapse;	border:1.5px solid #BBD1E0;text-align:center;margin-top:1px;margin-bottom:5px;	}
+.kpi_vs_table tr,.kpi_vs_table td{border:1px solid #BBD1E0;padding:3px 0px;}
+.kpi_vs_table .main_title{color:#195077;font-weight:bold;background:#EEF4F9;}<!--主标题-->
+.kpi_vs_table .col_title{color:#195077;}<!--列标题-->
+
+.fieldset{width:100%;border:1px solid #BBD1E0;padding:5px 7px;margin-bottom:5px;}
+.fieldset legend{color:#05548C;}
+
+.mouse_over{cursor:pointer;}
+
+.contain_btn button{height:21px;padding-top:3px;border:1px solid #859DB5;color:#195077;background:#EFF4F8;
+					margin-left:3px;border-top:1px solid #E9EFF5;border-left:1px solid #E9EFF5;}
+.button{height:21px;padding-top:3px;border:1px solid #859DB5;color:#195077;background:#EFF4F8;
+					margin-left:3px;border-top:1px solid #E9EFF5;border-left:1px solid #E9EFF5;}				
+.td_bg_1{background:#EFF4F8;}
+

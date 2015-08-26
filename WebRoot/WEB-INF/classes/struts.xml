@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN" "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.devMode" value="false" />
+	<constant name="struuts.i18n.encoding" value="UTF-8"></constant>
+	<constant name="struts.custom.i18n.resources" value="tree"></constant>
+	<constant name="struts.serve.static.browserCache" value="false"></constant>
+	<constant name="struts.configuration.xml.reload" value="true"></constant>
+	<constant name="struts.objectFactory" value="spring"></constant>
+	<constant name="struts.multipart.maxSize" value="5048576"></constant>
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true"></constant>
+
+
+	<package name="Controller" namespace="/Controller" extends="struts-default">
+
+		<action name="*_*" class="{2}Action" method="{1}"></action>
+
+	</package>
+
+	<package name="adminReport" namespace="/adminReport" extends="struts-default">
+
+		<action name="adminReport_*" class="org.moon.action.report.ReportAdminAction"
+			method="{1}">
+			<result name="success">/report_admin/admin_report.jsp</result>
+			<result name="proc_success">/report_admin/admin_proc.jsp</result>
+			<result name="error">/view/test/error.jsp</result>
+		</action>
+	</package>
+
+
+	<package name="adminUser" namespace="/adminUser" extends="struts-default">
+		<action name="admin_*" class="org.moon.action.sys.UserAdminAction"
+			method="{1}">
+			<result name="success">/sys_admin/admin_user.jsp</result>
+			<result name="edit_user">/sys_admin/edit_user.jsp</result>
+		</action>
+	</package>
+
+	<package name="test" namespace="/test" extends="struts-default">
+		<action name="demo_*" class="com.yunyuan.hr.action.DemoAction"
+			method="{1}">
+			<result name="success">/test/jqueryDemo.jsp</result>
+			<result name="error">/view/test/error.jsp</result>
+		</action>
+	</package>
+
+  <include file="struts_config/employee_admin.xml"></include>
+  <include file="struts_config/advertise_admin.xml"></include> 
+  <include file="struts_config/attence_admin.xml"></include>
+  <include file="struts_config/salary_admin.xml"></include> 
+</struts>    

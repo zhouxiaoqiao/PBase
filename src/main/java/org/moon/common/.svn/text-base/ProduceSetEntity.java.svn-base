@@ -1,0 +1,404 @@
+package com.kt.kpi.fixreport.util;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.kt.kpi.common.util.DateUtil;
+import com.kt.kpi.fixreport.model.DwFactGddwMonthXlpbfzdytj;
+/*
+ * 
+ * 2011/5/02周小桥
+ * className
+ * 
+ * 
+ */
+public class ProduceSetEntity {
+    private Field[] fields=null;
+    private String className=null;
+    private Object obj=null;
+    private Map property=new HashMap();//存储属性和值
+    EntityFactory entityFactory=null;
+    private List condition=new ArrayList<SelfProperty>();//关键字段备查询判断数据库重复记录
+	/*
+	 * 构造方法1
+	 */
+   public ProduceSetEntity(String name){
+		this.className=name;
+		entityFactory=new EntityFactory(name);
+		obj=entityFactory.getObj();
+		fields=obj.getClass().getDeclaredFields();
+	}
+   /*
+	 * 构造方法2
+	 */
+  public ProduceSetEntity(String name,Map property){
+	    entityFactory=new EntityFactory(name);
+		this.className=name;
+		obj=entityFactory.getObj();
+		fields=obj.getClass().getDeclaredFields();
+		this.property=property;
+		
+	}
+  /*
+	 * 构造方法3
+	 */
+ public ProduceSetEntity(String name,List condition){
+	    entityFactory=new EntityFactory(name);
+		this.className=name;
+		obj=entityFactory.getObj();
+		fields=obj.getClass().getDeclaredFields();
+		this.condition=condition;
+		
+	}
+ /*
+	 * 构造方法4
+	 */
+public ProduceSetEntity(String name,Map property,List condition){
+	    entityFactory=new EntityFactory(name);
+		this.className=name;
+		obj=entityFactory.getObj();
+		fields=obj.getClass().getDeclaredFields();
+		this.property=property;
+		this.condition=condition;
+		
+	}
+	public Field[] getFields() {
+		return fields;
+	}
+
+	public void setFields(Field[] fields) {
+		this.fields = fields;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+	/*
+	 * 通过字段名获得字段类型
+	 * 
+	 */
+	public String getByNameType(String name){
+		String typeString=null;
+		Field filed=null;
+		try{
+			
+			//初始字段
+			filed=obj.getClass().getDeclaredField(name);
+									 
+		}
+		catch(Exception e ){
+			if(filed==null)//大写字段
+				filed=obj.getClass().getDeclaredField(name.toUpperCase());
+			else if(filed==null)//小写字段
+				filed=obj.getClass().getDeclaredField(name.toLowerCase());
+
+		}
+		finally{
+			if(filed==null)//没有该字段返回String
+				 typeString="String";
+			else typeString=getFieldsType(filed);
+			return typeString;
+		}
+		//return typeString;
+	}
+	/*
+	 * 判断字段是否存在实体类中
+	 * 
+	 */
+	public boolean isExitsFied(String filedName){
+		boolean exits=false;
+		for(int i=0;i<this.getFields().length;i++){
+			if(filedName.equals(this.getFields()[i].getName())){
+				exits=true;
+			    break;
+			}
+			else continue ;
+	   }
+		return exits;
+	}
+	/*
+	 * 
+	 * 产生基本数据类型对象
+	 */
+	private Object[] getFieldBaseObj(Field field, String fieldVal){
+		String fieldType=getFieldsType(field);
+		Object[] c = new Object[]{null};
+		if("String".equals(fieldType)){
+			c = new Object[]{fieldVal};
+		}else if("Float".equals(fieldType)||"float".equals(fieldType)){
+			c = new Object[]{new Float(fieldVal)};
+		}else if("Double".equals(fieldType)||"double".equals(fieldType)){
+			c = new Object[]{new Double(fieldVal)};
+		}else if("Integer".equals(fieldType)||"int".equals(fieldType)){
+			c = new Object[]{new Integer(fieldVal)};
+		}else if("long".equals(fieldType)||"Long".equals(fieldType)){
+			if("_empty".equals(fieldVal))
+			 c=new Object[]{new Long("0")};
+			else 
+			  c = new Object[]{new Long(fieldVal)};
+		}else if("Date".equals(fieldType)){
+			c = new Object[]{DateUtil.StringToDate(fieldVal)};
+		}
+		else if("Timestamp".equals(fieldType)){
+			c = new Object[]{this.StringChangDate(fieldVal)};
+		}
+		return c;
+	}
+/*
+ *获得实体类的属性的类型 
+ * 
+ */
+	private String getFieldsType(Field field){
+		String strFieldType = field.getName().substring(field.getName().lastIndexOf(".")+1);
+		Class c = field.getType();
+		strFieldType = c.getName().substring(c.getName().lastIndexOf(".")+1);	
+		return strFieldType;
+	}
+    //反射,设置实体属性值
+   private void setKeyVal(String methodName,String val,Field fieldType){
+		try{
+		  Method method = obj.getClass().getDeclaredMethod(methodName, new Class[]{fieldType.getType()});	
+		  method.invoke(obj, getFieldBaseObj(fieldType, val));
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+
+
+  private static Timestamp StringChangDate(String str){
+	      Timestamp ts=null;
+		  try{
+		  if(str!=null){
+			 str=str.trim();
+			 if(!"".equals(str)){
+				if(str.length()>9&&str.length()<19){
+					  str=str.substring(0, 10);
+					  java.sql.Date  sdt=java.sql.Date.valueOf(str); 
+					  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					  String time = df.format(sdt);
+					  ts = Timestamp.valueOf(time);
+				
+				 }			  
+				 else if(str.length()>=19) {
+					    str=str.substring(0, 19);
+					    ts= Timestamp.valueOf(str);
+					   
+				  }
+				else   return null;
+			    }
+		     }
+			  else
+				  return null;
+		  }
+		  catch(Exception e){
+			  e.printStackTrace();
+		  }
+	    return ts ;
+	   }	 
+	public Object getObj() {
+		//获得对象之前设置对象实体值
+		this.setObjectProperty();
+		return obj;
+	}
+	public void setObj(Object obj) {
+		this.obj = obj;
+	}
+	public Map getProperty() {
+		return property;
+	}
+	public void setProperty(Map property) {
+		this.property = property;
+	}
+	public void setProperty(){
+		
+	 }
+	/*
+	 * 获得实体类的属性,返回数组
+	 * 
+	 */
+	public String[] getAllFields(){
+		Class cls=obj.getClass();
+		String [] strField = null;
+		Field[] fields = cls.getDeclaredFields();
+		strField = new String[fields.length];
+		for (int i = 0; i < fields.length; i++) {
+			Field field = fields[i];
+			strField[i] = field.getName();
+		}
+		return strField;
+	}
+	/*
+	 * 组装实体类obj
+	 * map.put("属性名","属性值")
+	 */
+	private void setObjectProperty(){
+		Map property=this.getProperty();
+		String keyArr[]=getAllFields();		
+		for(int i=0;i<keyArr.length;i++){
+			String key="";
+			String value="";	
+			key=keyArr[i];			
+			value=String.valueOf(property.get(key));
+			//设置关键字段以备用查询
+			 if(condition!=null&&condition.size()>0){
+					for(int j=0;j<condition.size();j++){
+						SelfProperty pt=(SelfProperty)condition.get(j);
+						if(key.equals(pt.getKeyName()))
+							pt.setValue(value);
+					 }
+				 }
+			if(value!=null&&!"".equals(value)&&!"null".equals(value)&&this.isExitsFied(key)){
+				String methodName="set"+key.substring(0, 1).toUpperCase()+key.substring(1);//字段名第一字母大写setXxx()		
+				//反射
+				this.setKeyVal(methodName, value, this.fields[i]);
+			}
+		}	
+	 }
+	/*
+	 * 获得前台数据
+	 * 约定客户端提交属性和Object属性都是大写或小写（必须格式相同）
+	 */
+	public Object getClientData(HttpServletRequest request){
+		
+		String keyArr[]=getAllFields();	//去实体成员属性名
+		try{
+		 request.setCharacterEncoding("UTF-8");
+		 for(int i=0;i<keyArr.length;i++){
+			String key="";
+			String value="";	
+			key=keyArr[i];					
+			//判断是否有下拉框约定字段后+Edit
+			value=request.getParameter(key);		
+			if(value!=null&&!"".equals(value)){
+				value=URLDecoder.decode(URLDecoder.decode(value,"UTF-8"),"UTF-8");
+			}			
+			if(value==null||"".equals(value)) value=request.getParameter(key+"Edit");
+			if(value!=null&&!"".equals(value)&&!"null".equals(value)){
+				String methodName="set"+key.substring(0, 1).toUpperCase()+key.substring(1);//字段名第一字母大写setXxx()	
+				//反射
+				this.setKeyVal(methodName, value, this.fields[i]);
+			}
+			
+		  }	
+		} 
+		 catch(Exception e){
+			  e.printStackTrace();
+		  }
+		Object  object=this.obj;		
+		return object;
+	}
+	
+public Object getClientDataLow(HttpServletRequest request){
+		
+		String keyArr[]=getAllFields();	
+		try{
+		 request.setCharacterEncoding("UTF-8");
+		 for(int i=0;i<keyArr.length;i++){
+			String key="";
+			String value="";	
+			key=keyArr[i];
+			String keyLow=key.toLowerCase();//客户端字段小写	Object属性大写		
+			//判断是否有下拉框约定字段后+Edit
+			value=request.getParameter(keyLow);		
+			if(value!=null&&!"".equals(value)){
+				value=URLDecoder.decode(URLDecoder.decode(value,"UTF-8"),"UTF-8");
+			}			
+			if(value==null||"".equals(value)) value=request.getParameter(keyLow+"Edit");
+			if(value!=null&&!"".equals(value)&&!"null".equals(value)){
+				String methodName="set"+key.substring(0, 1).toUpperCase()+key.substring(1);//字段名第一字母大写setXxx()	
+				//反射
+				this.setKeyVal(methodName, value, this.fields[i]);
+			}
+			
+		  }	
+		} 
+		 catch(Exception e){
+			  e.printStackTrace();
+		  }
+		Object  object=this.obj;		
+		return object;
+	}
+	
+	/*
+	 * 获得前台数据客户端字段大写	
+	 * 
+	 */
+	public Object getClientDataUpper(HttpServletRequest request){		
+		String keyArr[]=getAllFields();
+	  try{
+		 request.setCharacterEncoding("UTF-8");
+		for(int i=0;i<keyArr.length;i++){
+			String key="";
+			String value="";	
+			key=keyArr[i];
+			String keyUpper=key.toUpperCase();//客户端字段大写			
+			//判断是否有下拉框约定字段后+Edit
+			value=request.getParameter(keyUpper);
+			if(value!=null&&!"".equals(value)){
+				value=URLDecoder.decode(URLDecoder.decode(value,"UTF-8"),"UTF-8");
+			}			
+			if(value==null||"".equals(value))
+				value=request.getParameter(keyUpper+"Edit");
+			if(value!=null&&!"".equals(value)&&!"null".equals(value)){
+				String methodName="set"+key.substring(0, 1).toUpperCase()+key.substring(1);//字段名第一字母大写setXxx()	
+				//反射
+				this.setKeyVal(methodName, value, this.fields[i]);
+			}
+			
+		}	
+	  }
+	  catch(Exception e){
+		  e.printStackTrace();
+	  }
+		Object  object=this.obj;		
+		return object;
+	}
+	
+	
+	public List getCondition() {
+		return condition;
+	}
+	public void setCondition(List condition) {
+		this.condition = condition;
+	}
+	/*
+	 * 主函数
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		//ProduceSetEntity ps=new ProduceSetEntity("DwFactDamageDevice");
+	    Map propertyMap=new TreeMap();
+	    propertyMap.put("DGddwUnit", "6666666");
+	    propertyMap.put("FZmXjtx", 12l);
+	    propertyMap.put("DMonth", 12l);
+	   ProduceSetEntity ps=new ProduceSetEntity("DwFactGddwMonthXlpbfzdytj",propertyMap);
+	    ps.setProperty(propertyMap);	    
+	    DwFactGddwMonthXlpbfzdytj objNew =(DwFactGddwMonthXlpbfzdytj) ps.getObj();
+	    //objNew.setFZmXjtx(65l);
+	    //ps.save(objNew);
+		               
+	    System.out.println(  ps.getByNameType("DYear"));
+	    System.out.println(objNew.getDGddwUnit());
+	    System.out.println(objNew.getDMonth());
+	    System.out.println(objNew.getFZmXjtx());
+		   
+	   
+
+	}
+}

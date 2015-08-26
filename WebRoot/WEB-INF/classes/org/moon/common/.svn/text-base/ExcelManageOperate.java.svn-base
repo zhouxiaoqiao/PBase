@@ -1,0 +1,1360 @@
+package com.kt.kpi.fixreport.util;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.sql.ResultSetMetaData;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.RowSet;
+import net.sf.json.JSONObject;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.kit.common.AppConstants;
+import com.kt.kpi.common.DownFile;
+import com.kt.kpi.excels.service.ExportExcel;
+import com.kt.kpi.fixreport.model.FaultClass;
+import com.kt.kpi.fixreport.model.LowFault;
+import com.kt.kpi.fixreport.model.MidFaultInf;
+import com.kt.kpi.fixreport.model.SecdFault;
+import com.kt.kpi.framework.dao.GeneDao;
+import com.kt.kpi.kpimgr.service.TableEnt;
+/*
+ * @author zhouxiaoqiao
+ * @通过EXCEL导入/2011/04/02
+ * @throws Exception
+*/	
+@Service
+public class ExcelManageOperate {
+	@Autowired
+	private GeneDao geneDao;
+	@Autowired
+	private SelectOperate soService;	
+	private Sheet sheet=null;
+	private Workbook wb;
+	List<FileItem> fileItems = new ArrayList<FileItem>();
+	FileItem fileItem = null;
+/*
+ * ---------------------------------------------导入EXCEL第一步，获取sheet流---------------------------------------------------
+ * 通过EXCEL导入/2011/04/02周小桥
+ * @param request
+ * @param response
+ * @throws Exception
+*/	
+	//方法1
+	public Sheet getExcelSheet(List<FileItem> fileItems) throws Exception {					
+		 FileItem fileItem = null;
+		try{
+			 //得到fileItem
+			 for (int i = 0; i < fileItems.size(); i++) {// 依次处理每一个文件
+					fileItem = (FileItem) fileItems.get(i);
+					if (fileItem.isFormField()) {// 非文件类型
+
+					} else {// 文件类型
+						break ;
+			 }
+		   }
+			 wb = WorkbookFactory.create(fileItem.getInputStream());	
+		      if(wb==null){
+					throw new Exception("读取上传EXCEL文件出错");
+				 } 		      
+		      sheet=wb.getSheetAt(0);
+		   }
+		 catch(Exception e){
+			 
+			 e.printStackTrace();
+		 }		
+		 return sheet;
+	}
+	//方法2
+	public Sheet getExcelSheet(InputStream in) throws Exception {		
+		 Sheet sheet=null;	
+		 FileItem fileItem = null;
+		try{			
+			 wb = WorkbookFactory.create(in);	
+		      if(wb==null){
+					throw new Exception("读取上传EXCEL文件出错");
+				 } 		      
+		      sheet=wb.getSheetAt(0);
+		   }
+		 catch(Exception e){
+			 
+			 e.printStackTrace();
+		 }		
+		 return sheet;
+	}
+
+	
+/* 
+ * ---------------------------------------------第二步，将sheet转化实体对象存放在list中（其中检查数据有效性）---------------------------------------------
+ * 将Excel每行记录转化一个对象,返回对象列表
+ * 注：目前使用：表5：10kV线路、配变负载和电压情况统计	；表K4-预防性试验计划完成情况板									
+ */
+	 public List getObjectList(Sheet sheet,String objectName,String deptId,String userId) throws Exception{
+		    List errList=new ArrayList();	
+		    List objectList=new ArrayList();
+		    objectList.add("success");
+			errList.add("unsuccess");
+			Map keyMap=new HashMap();			
+		try{
+		//按名字取
+		int rows=getFactEndRow(sheet);//获取有数据的最大行数			
+		//前面4行是表头
+		if(rows<=3){
+			throw new Exception("EXCEL模板有问题，导出的模板前3行不可修改，请检查");
+		}
+		Cell cell=null;
+		int startReadRow=0;		String xuhao=null;		
+		startReadRow=getFactStartRow(sheet);		
+		//获取字段名
+		Row row_head=sheet.getRow(startReadRow-1);		
+		int col_length=0;
+		col_length=getFactEndCol(sheet, startReadRow);
+		for(int cl=0;cl<=col_length;cl++){			
+			cell=row_head.getCell(cl);
+		 if(cell!=null){	
+			String keyName=this.getCellValue(cell, false);
+			if(keyName!=null){
+				keyName=keyName.trim();
+				keyMap.put(cl, keyName);
+			 }
+		   }
+		}	
+	    //开始读取数据
+		Timestamp staticTime=this.getStaticTime(sheet);
+		for(int index=startReadRow;index<=rows;index++){			
+			Row row=sheet.getRow(index);			
+			//取事实值
+			String factStr="";
+		    ProduceSetEntity pse=new ProduceSetEntity(objectName);
+			Map valueMap=new HashMap();
+			for(int j=1;j<col_length;j++){
+				String key=(String)keyMap.get(j);
+				if(key!=null&&!"".equals(key)){
+					cell=row.getCell(j);
+					String value=this.getImportExcept(errList, cell, pse.getByNameType(key), index, j);
+					if(j==1){//处理部门					
+						List dept=getdeptByExcleName(value, deptId);						
+					     if(dept.size()==2){	
+						 	 valueMap.put(key, dept.get(0).toString());
+					       }
+					      else {
+					    	   errList.clear();
+						       if(dept.size()==1)
+						         errList.add(dept.get(0));
+						        else 
+							      errList.add(dept.get(2));
+						        return errList ;
+					            }	
+					  }
+					else valueMap.put(key, value);
+				}
+					
+			}
+		  if(valueMap.size()>0&&pse.getObj()!=null){//把对象存放在列表中
+			 valueMap.put("state", "3");//导入初试数据状态
+			 //设置统计时间			
+			 if(pse.isExitsFied("doDate")){
+				 valueMap.put("doDate", getStaticTime(sheet));
+			 }
+			  
+			 else if(pse.isExitsFied("staticTime")){
+				 valueMap.put("staticTime", getStaticTime(sheet));
+			 }				
+			 else if(pse.isExitsFied("DO_DATE")){
+				 valueMap.put("DO_DATE", getStaticTime(sheet));
+			 }	
+			 //设置录入人和时间-2011/8/11
+			 valueMap.put("creatUserid", userId);
+			 valueMap.put("creatTime", getSysDate());
+			 valueMap.put("updUserid", userId);
+			 pse.setProperty(valueMap);
+             objectList.add(pse.getObj()); 
+		    }			
+		  }		 
+		
+	 }
+	catch(Exception e){		
+		e.printStackTrace();
+	   }
+	  if(errList.size()>1){
+
+		  objectList.clear();
+			return errList;
+		}
+	   return objectList;
+	 }
+/* 
+ *  ---------------------------------------------第三步，核对Excel记录是否已存在重复---------------------------------------------
+ * 将Excel每行记录转化一个对象,返回String对象
+ * param table
+ * 设置属性和值,准备条件--反射
+ */
+	  public Object setPropertyVal(Object keyObj,String name,String way){
+			 String methodName="get"+name;
+			 SelfProperty pt=null;
+			 try{
+			 //反射
+			  Method method = keyObj.getClass().getMethod(methodName);
+			  Object obj =method.invoke(keyObj, null);		  
+			  String type=getFieldsType(keyObj.getClass().getDeclaredField(name));
+			  pt=new SelfProperty();
+			  pt.setKeyName(name);
+			  pt.setWay(way);
+			  if(obj!=null){
+			    if("Date".equals(type)||"Timestamp".equals(type)){
+			    	 String str=obj.toString();
+			    	 str=str.trim();			   
+			         pt.setValue(str.substring(0, 10));
+			      }
+			      else  pt.setValue(obj.toString());
+			  }
+			  pt.setFiledType(type);
+			 }
+			 catch(Exception e){
+				 e.printStackTrace();
+			 }
+			 return pt;
+		    }	 
+/* 
+ *  ---------------------------------------------第四步，核对list中实体对象存放在数据是否已存在系统数据库中---------------------------------------------
+ * 将Excel每行记录转化一个对象,返回String对象
+ * param table
+ * param condition 条件参数组
+*/	
+	 public String isExistsDB(String table,List condition){
+		 String existsInf=null;
+		 String sql="select * from "+table +" where  " ;
+		 if(condition!=null&&condition.size()>0){
+			 for(int i=0;i<condition.size();i++){
+				    SelfProperty  pt=(SelfProperty)condition.get(i);
+				    String type=pt.getFiledType();
+				    String way=pt.getWay();
+				    if(way==null) way="=";
+				    if(i==0){
+				    	if("Date".equals(type)||"Timestamp".equals(type))//日期型
+				    		sql+=" "+pt.getKeyName()+way+" to_date('"+pt.getValue()+"','yyyy-mm-dd')";				    	
+				    	else if("like".equals(way))
+				    		 sql+=" and "+pt.getKeyName()+way+" '%"+pt.getValue()+"%'";
+				    	  else
+				    		 sql+=" "+pt.getKeyName()+way+" '"+pt.getValue()+"'";
+				    }
+				    else {				    	
+				    	if("Date".equals(type)||"Timestamp".equals(type))//日期型
+				    		sql+=" and "+pt.getKeyName()+way+" to_date('"+pt.getValue()+"','yyyy-mm-dd')";
+				    	else if("like".equals(way))
+				    		 sql+=" and "+pt.getKeyName()+way+" '%"+pt.getValue()+"%'";
+				    	   else
+				    		 sql+=" and "+pt.getKeyName()+way+" '"+pt.getValue()+"'";
+				    					    	
+				    }
+				 }
+			  try{
+					RowSet rs= geneDao.executeQuery(sql);
+				    if(rs.next()){//系统已经存在
+				    	existsInf="在系统中已存在另一记录,提交失败!";
+				      }
+			        }
+		           catch(Exception e){
+		    	         e.printStackTrace();
+		             }
+			 
+		 }
+	 
+		 return existsInf;
+		 
+	 }
+/*
+ * ---------------------------------------------导入EXCEL第五步，将对象批量保存到数据库中----------------------------------------
+ *param list存放实体对象数据
+ */ 
+   //方法1
+	public String saveExcelData(List list){
+			 String success="";
+			 try{
+				 if(list.size()>1){
+					 list.remove(0);//从第2个对象开始导入
+					 geneDao.saveOrUpdate(list);
+					 success="成功导入了"+(list.size())+"条数据!";
+				 }
+				 else success="导入空数据!";
+			 }
+		    catch(Exception e){
+		    	e.printStackTrace();
+		    }
+			 return success;
+		}
+	 //方法2
+	public Object saveExcelData(Object object){
+			 String success="";
+			 try{
+				 if(object !=null){					
+					 geneDao.save(object);					 
+				 }
+				 else  return null;
+			 }
+		    catch(Exception e){
+		    	e.printStackTrace();
+		    }
+			 return object;
+		}	
+	/*
+	 * 导入异常信息提示2011/05/04周小桥，检查数据有效性，并将错误保存
+	 * 
+	 */
+	public String getImportExcept(List errList,Cell cell,String type, int row,int col){
+		String err="";
+		ErrorClass ec=new ErrorClass();
+		String value=null;
+	   if(type!=null){
+		 try{	
+		    value=this.getCellValue(cell, false);	
+		  }
+		  catch(Exception e){//获取异常
+			err="获取第"+(row+1)+"行"+"第"+getExcelCol(col)+"列的数据失败,可能是Excel的格式不是中文或乱码，不允许导入！";
+			ec.setRow_num(row+1);
+			ec.setInf(err);
+			errList.add(ec);			
+			return null;
+		    }
+			 if(value==null||"".equals(value)){
+			   err="第"+(row+1)+"行"+"第"+getExcelCol(col)+"列为空值，不允许导入！";
+			   ec.setRow_num(row+1);
+			   ec.setInf(err);
+			   errList.add(ec);
+			   return null;
+			 }
+			 else{//判断是否存在类型异常
+				  try{
+					  if("Date".equals(type)){ 
+						  value=value.substring(0, 10);
+						  Timestamp ts=(Timestamp)this.getFieldBaseObj(type, value);
+						  value=ts.toString();
+						  }
+					  else if("Integer".equals(type)||"Float".equals(type)||"Long".equals(type)||"Double".equals(type)||
+							  "int".equals(type)||"float".equals(type)||"long".equals(type)||"double".equals(type))
+					     { 
+					       if("Integer".equals(type)||"Long".equals(type)||"int".equals(type)||"long".equals(type)){//去掉小数点
+					    	    value=String.valueOf(this.excelParseNumber(value));
+					        }
+						     value=String.valueOf(this.getFieldBaseObj(type, value));
+					       }
+					    else 
+					    	  value=(String)this.getFieldBaseObj(type, value);
+				     }
+					catch(Exception e){
+						if("Date".equals(type)||"Timestamp".equals(type)){
+							err="第"+(row+1)+"行"+"第"+getExcelCol(col)+"列的类型与要求日期的类型不匹配，不允许导入！";
+						}
+						else if("Integer".equals(type)||"Float".equals(type)||"Long".equals(type)||"Double".equals(type))
+						{
+							err="第"+(row+1)+"行"+"第"+getExcelCol(col)+"列的类型与要求的数字类型不匹配，不允许导入！";
+						  }
+						else
+							err="第"+(row+1)+"行"+"第"+getExcelCol(col)+"列的类型与要求的类型不匹配，不允许导入！";
+						ec.setRow_num(row+1);
+						ec.setInf(err);
+						errList.add(ec);			
+						return null;
+				  }
+			 }			    
+						
+	      }
+	 else {//type==null对某些字段不需要检查类型匹配或空
+		 try{
+		     value=this.getCellValue(cell, false);	
+		 }
+		 catch(Exception e){
+				err="获取第"+(row+1)+"行"+"第"+getExcelCol(col)+"列的值异常可能值太大或乱码，不允许导入！";
+				ec.setRow_num(row+1);
+				ec.setInf(err);
+				errList.add(ec);			
+				return null;
+	        }
+	     }
+	   return value;
+	}
+	/*
+	 * 将导入错误存取
+	 * 
+	 */
+	public void writeError(String userid,String tableName,List list){
+		//先清除先前导入的错误信息
+		if(tableName!=null)tableName=tableName.trim();
+		String delSql="delete  DW_FACT_IMPORTERR d where d.import_userid='"+userid+"'  and d.tablename='"+tableName+"'";
+		geneDao.executeUpdate(delSql);
+		for(int i=1;i<list.size();i++){//第0个对象存"unsuccess"
+			ErrorClass ec= (ErrorClass)list.get(i);
+			int row_num=ec.getRow_num();
+			String Inf=ec.getInf();
+			if(row_num!=0&&Inf!=null){
+				Inf=Inf.trim();
+				String errSql="  insert into  DW_FACT_IMPORTERR( import_userid,TABLENAME,ROW_NUM,ERR_INFOR) " +
+		        " values ('"+userid+"','"+tableName+"','"+row_num+"','"+Inf+"')";
+				geneDao.executeUpdate(errSql);
+			}
+		   
+		}
+	}
+	 /**
+	 * 通过EXCEL导入的部门名获得部门ID和真实名/2011/4/2周小桥
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	public List getdeptByExcleName(String deptName,String deptId)throws Exception{
+	    List dept=new ArrayList<String>();
+	    int i=0;
+	    String dim_id=null;
+	    String nameExcle="";
+		if(deptName!=null&&!"".equals(deptName)){
+		  deptName=deptName.trim();
+		  String sql="select t.dept_id, t.dept_simlename, t.dept_fullname "
+                      +" from dm_dim_deptinfo t  where (detp_type in (0,1,3,4,6,10) or detp_type is null) and t.dept_id in  " 
+                      +" (  select dept_id  from dm_dim_rel_stat_to_dept "
+                         +"  start with dept_id='"+deptId+"' connect by prior dept_id = parent_id )";
+		  try{
+	      RowSet rs=geneDao.executeQuery(sql);	
+	      while(rs.next()){
+	    	  String simplename=rs.getString("dept_simlename");
+	    	  String full_name=rs.getString("dept_fullname");
+	    	  if(deptName.contains(simplename)&&full_name.contains(deptName)){
+	    		  dim_id=rs.getString("dept_id");
+	    		  if(i>0)
+	    			 nameExcle+=";"+deptName;
+	    		  else
+	    		    nameExcle=deptName;
+	    		  i++;
+	    	  }
+	    	  
+	        }
+		  }
+	      catch(Exception e){
+	    	  e.printStackTrace();
+	       }
+	      
+		}
+		if(i>0){
+			dept.add(dim_id);
+			dept.add(nameExcle);
+		}
+		String inf="";
+	    if(i>1){	    	
+	        String DEPT_NAME=(String)dept.get(1);//部门名
+	        if(DEPT_NAME.contains(";")){
+	    	   inf="你选择的部门中包括的单位已存在两个以上部门:"+DEPT_NAME+"与EXCEL中的单位"+deptName+"匹配导入失败;请确认EXCEL的部门!";
+		      dept.add(inf);
+	        }
+	     }
+	    if(dept.size()==0){
+	    	inf= "你选择的部门中所包括的单位没有与EXCEL中的单位: "+deptName+" 匹配,导入失败;请确认EXCEL的部门!";
+	    	dept.add(inf);
+	      }
+		return dept;	
+	}
+	
+	
+	/**
+	 * 下载EXCEL备注的附件
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	public void downExcelMould(String fileFomatName,String path,HttpServletRequest request, HttpServletResponse response) throws Exception{				
+		String excelMethod=request.getParameter("excelMethod");
+		if("All".equals(excelMethod)||"help".equals(excelMethod)){//下载全部模板压缩文件(.rar)或者操作手册
+			DownFile.down(fileFomatName,path,response);
+		}			
+		else{
+			//设置要更新的excel内容
+			List list=new ArrayList<SelfProperty>() ;
+			Map mp=getLoginDept(request);
+			SelfProperty sp=new SelfProperty();
+			sp.setFiledType("int");
+			sp.setKeyName("1");//列号
+			sp.setValue((String)mp.get("dept_name"));
+			list.add(sp);		
+			String path_new=updateExcel(path,list);
+			DownFile.down(fileFomatName,path_new,response);
+		}	
+	}
+	
+	/**
+	 * 因为存在2种导入excel模板针对部门行号不同确定不同的导出方法
+	 * 下载EXCEL备注的附件
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	public void downExcelTemplet(String fileFomatName,String path,HttpServletRequest request, HttpServletResponse response) throws Exception{				
+		//设置要更新的excel内容
+		List list=new ArrayList<SelfProperty>() ;
+		Map mp=getLoginDept(request);
+		SelfProperty sp=new SelfProperty();
+		sp.setFiledType("int");
+		sp.setKeyName("0");//列号
+		sp.setValue((String)mp.get("dept_name"));
+		list.add(sp);		
+		String path_new=updateExcel(path,list);
+		DownFile.down(fileFomatName,path_new,response);
+		
+	}
+/*
+ * 
+ * 获取excel开始真正读取记录行号
+ */	
+	public int getFactStartRow(Sheet sheet){
+		int startReadRow=0;
+		//第一种excel模板没有英文或拼音字段
+		startReadRow=getStartWay(sheet,1,"单位（地市＋县区局）");
+		if(startReadRow<=0){
+			//第二种excel模板英文或拼音字段
+			startReadRow=getStartWay(sheet,0,"单位（地市＋县区局）");
+		}	
+		if(startReadRow<=0){
+			//第三种excel模板英文或拼音字段
+			 startReadRow=getStartWay(sheet,0,"单位");
+		}
+		if(startReadRow<=0){
+			//第四种excel模板英文或拼音字段
+			 startReadRow=getStartWay(sheet,1,"单位");
+		}
+		return startReadRow;
+	}
+
+	/*
+	 * 获取年月
+	 */
+	public Map getYearMon(Timestamp ts ){
+		Calendar calendar = GregorianCalendar.getInstance(); 
+		calendar.setTime(ts);
+     if(ts!=null){
+    	  Map dateMap = new HashMap();
+    	  int hou=0;
+    	  dateMap.put("year", calendar.get(Calendar.YEAR));
+    	  dateMap.put("mon", calendar.get(Calendar.MONTH)+1);//月从0开始
+    	  if(calendar.get(Calendar.HOUR)==0){//小时从0开始
+    		  hou=12;
+    	  }
+    	  dateMap.put("hou",hou );		 
+    	  dateMap.put("mit", calendar.get(Calendar.MINUTE)); 
+    	  dateMap.put("sec", calendar.get(Calendar.SECOND));
+    	  return dateMap;
+     }
+     else  return null;
+	}
+/*
+ * 寻找统计时间
+ * 
+ */	
+	public Timestamp getStaticTime(Sheet sheet){
+		Timestamp staticTime=null;
+		int tongRow=0;
+		String tongTime="";
+    try{		
+		int rows=sheet.getLastRowNum();
+		for(int r=0;r<rows;r++){
+			Cell cellT=sheet.getRow(r).getCell(2);
+			if(cellT!=null&&Cell.CELL_TYPE_STRING==cellT.getCellType())
+			 tongTime=sheet.getRow(r).getCell(2).getStringCellValue();			
+			else continue ;
+			if(tongTime.contains("统计时间")){
+				tongRow=r;
+				break;
+			}					
+		}
+		Row row_head=sheet.getRow(tongRow);
+		String statict=null;
+		int col_length=row_head.getLastCellNum();
+		for(int i=2;i<=col_length;i++){
+			Cell cellT=sheet.getRow(tongRow).getCell(i);
+			if(cellT!=null&&cellT.getCellType()==HSSFCell.CELL_TYPE_NUMERIC&&HSSFDateUtil.isCellDateFormatted(cellT)){
+				statict=this.getCellValue(cellT, false);
+			  break;
+			}
+			
+		}	
+        if(statict!=null&&!"".equals(statict))
+		    staticTime= StringChangDate(statict.substring(0, 10));		
+		if(staticTime==null){//默认为系统时间
+			 Date sysdate=new Date();
+	 		  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	 		  String time = df.format(sysdate);
+	 		  Timestamp ts = Timestamp.valueOf(time);
+		  }
+      }
+     catch(Exception e){
+    	 e.printStackTrace();
+      }
+		return staticTime ;
+	}
+
+	/*
+	 *excel强制转换数值型
+	 * 
+	 */
+	public long excelParseNumber(String factValue ){
+		    long num=0l;			  	
+		    if(factValue!=null){
+		    	factValue=factValue.trim();
+		    	int point=0;
+		    	for(int i=factValue.length()-1;i>0;i--){
+		    		char c=factValue.charAt(i);
+		    		if(c=='.'){
+		    			point=i;
+		    			break;
+		    		}		    		
+		    	}
+		    	if(point>0){
+		    		  factValue=factValue.substring(0, point);
+		    		  num=Long.parseLong(factValue);
+		    	}		    					
+		    }
+		   	
+			return num;  
+	}
+/*
+ *excel强制转换百分率
+ * 
+ */	
+public String getRate(String rate ){
+	double g=Double.parseDouble(rate);
+	g=g*100;
+    //四舍五入保留3位小数 
+	   BigDecimal bg=new BigDecimal(g).setScale(1, BigDecimal.ROUND_HALF_UP);
+	   rate=bg.toString();
+	return rate;
+	
+}
+	 /*
+	  * 导出功能
+	  * 
+	  */
+	 public void ExportExcel(String sql,String title,String[] heades,String fileName ,HttpServletResponse response){
+		 try{	
+				TableEnt tableEnt=this.getExportExcelData(heades, sql);
+				String sheetName=title;
+				List datas = null;
+				if (tableEnt!=null) {
+					List heads =tableEnt.getHeadList();//中文表头
+					List columns =tableEnt.getColList();//英文表头
+					datas =tableEnt.getData();//数据
+					String[] headers = new String[heads.size()];
+					String[] headCodes = new String[heads.size()];
+					for (int i = 0; i < heads.size(); i++) {
+						headers[i]=(String) heads.get(i);
+						headCodes[i]=(String) columns.get(i);
+					}
+					ExportExcel exportExcel = new ExportExcel();
+				    fileName = new String(fileName.getBytes("GBK"), "ISO8859_1");
+				    response.setContentType("octets/stream");
+					response.addHeader("Content-Disposition", "attachment;filename="+fileName); 
+					OutputStream out = response.getOutputStream();
+				    exportExcel.exportExcel(sheetName, title, headers, headCodes, datas,out);
+				    out.close();
+				    datas=null;
+				    headCodes=null;
+				    headers=null;
+				    tableEnt=null;
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+				
+			}
+		 
+		 
+		 
+	 }
+	 /*
+	  * 导出功能---表数据
+	  * 
+	  */
+	 public TableEnt getExportExcelData(String[] heads,String sql) {
+			List headers = new LinkedList();
+			TableEnt tableEnt = new TableEnt();
+			List headCodes = new LinkedList();
+			//String[] heads = {"部门单位","用户名","EIPID","指标名称","年","月","统计口径","状态","数量"};
+			for (int i = 0; i < heads.length; i++) {
+				headers.add(heads[i]);
+			}
+			String[] headCode= {};
+			headCode[10]="";
+			for (int i = 0; i < headCode.length; i++) {
+				headCodes.add(headCode[i]);
+			}
+			sql = "select rownum rownums,t.* from ("+sql+") t where rownum<=50000";
+			List datas = new ArrayList();
+			try {
+				RowSet	 rows = geneDao.executeQueryOra(sql);
+				ResultSetMetaData rsmd = rows.getMetaData();
+				int columns = rsmd.getColumnCount();
+				datas= getListData(rows, rsmd, columns);
+				for (int i = 1; i <= columns; i++) {
+					//key = rsmd.getColumnName(i);
+					
+				}
+				//datas = targetValueDAO.executeSQL(sql);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			tableEnt.setColList(headCodes);
+			tableEnt.setHeadList(headers);
+			tableEnt.setData(datas);
+			return tableEnt;
+		}
+/*
+ * 获取实际结束行
+ * param sheet
+ */	 
+public int getFactEndRow(Sheet sheet){//实际的行
+		   int endRow=0;
+		   int rows=sheet.getLastRowNum();
+		   String	deptName=null;
+		   try{
+		   for(int r=rows;r>0;r--){
+				if(sheet.getRow(r)!=null){
+				 if(sheet.getRow(r).getCell(1)!=null){
+					 Cell cell=sheet.getRow(r).getCell(1);
+				 deptName=getCellValue(cell,false);//单位
+				 if(deptName!=null&&!"".equals(deptName)){
+					 endRow=r;
+				     break;
+				   }
+				  else continue ;
+				  }
+				 else continue ;
+				}
+				else continue ;	 
+				 
+	       }
+		   }
+		   catch(Exception e){
+			   e.printStackTrace();
+		   }
+		   return endRow ;
+	   }
+/*
+ * 获取实际结束列号
+ * param sheet
+ */	 
+public int getFactEndCol(Sheet sheet,int rowNum){//实际的行
+		  int  factLastNum=0;
+		  Row row=sheet.getRow(rowNum);
+		  int  lastNum=0;
+		  try{
+		    lastNum=  row.getLastCellNum();
+		   for(int col=lastNum;col>0;col--){
+			   Cell cell= row.getCell(col);
+			   if(cell==null) continue;
+			    else if(!"".equals(this.getCellValue(cell, false))&&!"null".equals(this.getCellValue(cell, false))){
+				   factLastNum=col+1;//列号转列数(Excel从苓开始)+1
+				   break;
+			     } 
+	          }
+		   }
+		   catch(Exception e){
+			   e.printStackTrace();
+		   }
+		   return factLastNum ;
+	   }
+/*
+ * 初始化导入错误信息页面
+ * 
+*/
+	  public void getErrByPage(HttpServletRequest request, JSONObject jsonObj) throws Exception {
+	  	String userId = (String)request.getSession().getAttribute(AppConstants.SESSION_USERID);
+	  	String tableName=request.getParameter("tableName");
+	  	//获取页号
+			int currPage = request.getParameter("page") != null ? Integer
+					.parseInt(request.getParameter("page")) : 1;
+
+			int rowStart = 0;
+			int rowEnd =0;
+			int rowcount = 0;
+		// 设置页码 by wxd
+			int pagesize = 10;//AppConstants.PAGE_DATALIST_COUNT;
+			if (request.getParameter("psize") != null
+					&& !"".equals(request.getParameter("psize"))) {
+				pagesize = Integer.parseInt(request.getParameter("psize"));
+			}
+			 String  sql =" select * from DW_FACT_IMPORTERR  where IMPORT_USERID='"+userId+"' and TABLENAME='"+tableName+"'";
+			 this.getPaging(sql, pagesize, currPage, jsonObj);       
+		}
+	  public void getPaging(String sql,int pagesize,int currPage ,JSONObject jsonObj)throws Exception{
+		   int records = getRowCount(sql);//得到记录总数
+			int rowStart = 0;
+				int rowEnd =0;
+				int total = records%pagesize==0 ? records/pagesize : records/pagesize+1;// 总页数 
+				//得到查询记录的开始数
+				if (currPage>total) {
+					currPage=total;
+				}
+				rowStart = (currPage-1)*pagesize+1;
+				rowEnd = currPage*pagesize;
+				//得到分页查询的SQL语句
+				sql = getPageSQL(sql, rowStart, rowEnd);
+				RowSet	 rows = geneDao.executeQuery(sql);
+				ResultSetMetaData rsmd = rows.getMetaData();
+				int columns = rsmd.getColumnCount();
+				List<Map<String, String>> datas = getListData(rows, rsmd, columns);
+			jsonObj.put("rows", datas);
+		    jsonObj.put("page", currPage);     // 当前页 
+		    jsonObj.put("total", total);    // 总页数 
+		    jsonObj.put("records", records);  // 总记录数 
+		  }
+	  	 
+	 private List<Map<String, String>> getListData(RowSet rows,
+				ResultSetMetaData rsmd,int columns) throws Exception {
+			List<Map<String, String>> datas = new ArrayList<Map<String,String>>();
+			Map<String, String> data = null;
+			String value;
+			String key;
+			while (rows.next()) {
+				data = new LinkedHashMap<String, String>();
+				for (int i = 1; i <= columns; i++) {
+					key = rsmd.getColumnName(i);
+					 if(key.equals("F_CANCE_YESNO"))
+						{	
+						value =rows.getString(key);
+						if("true".equals(value)||"1".equals(value)){
+							value="是";
+						}
+						else
+							value="否";	          
+		 	          }
+					 else if(key.equals("STATE")){			 
+						 value = rows.getString(key);
+							if("1".equals(value)){
+								value="审批通过";
+							}
+							else if("2".equals(value)) value="被退回";	
+							else if("3".equals(value)) value="草 稿";	
+							else  value="待审批";
+					  }	
+					 else if(key.equals("F_FAULT_TYPE")){			 
+						 value = rows.getString(key);
+							if("J".equals(value)){
+								value="紧急缺陷";
+							}
+							else if("Z".equals(value)) value="重大缺陷";	
+							else if("Y".equals(value)) value="一般缺陷";	
+							else  value="请选择";
+					  }	
+					else	
+					   value = rows.getString(key);
+					
+				 if (value == null) value = "";
+					data.put(key.toLowerCase(), value);
+				}
+				if (!data.isEmpty()) {
+					datas.add(data);
+				}
+			}
+			return datas;
+		   }
+ 
+  
+  private Object getFieldBaseObj(String fieldType, String fieldVal){
+		Object c = new Object();
+		if("String".equals(fieldType)){
+			c = fieldVal;
+		}else if("Float".equals(fieldType)||"float".equals(fieldType)){
+			c = Float.parseFloat(fieldVal);
+		}else if("Double".equals(fieldType)||"double".equals(fieldType)){
+			c =  Double.parseDouble(fieldVal);
+		}else if("Integer".equals(fieldType)||"int".equals(fieldType)){
+			c = Integer.parseInt(fieldVal);
+		}else if("Long".equals(fieldType)||"long".equals(fieldType)){
+			c =  Long.parseLong(fieldVal);
+		}else if("Date".equals(fieldType)){
+			c = StringChangDate(fieldVal);
+		}
+		return c;
+	}
+
+  /**
+   * 得到分页查询SQL
+   * @param {sql String} 查询SQL语句
+   * @param {rowStart int} 查询的开始行数
+   * @param {rowEnd int} 查询的结束行数
+   * @return {String} 返回带分页功能的查询SQL语句
+   */
+  private String getPageSQL(String sql,int rowStart,int rowEnd) {
+  	String pageSQL = "select * from (" +
+  						"select rownum rowIndex,a.* from("+
+  							"select * from("+
+  								sql+")" +
+  						") a where rownum<="+rowEnd+
+  					" )b where b.rowIndex between "+rowStart+" and "+rowEnd;
+  	return pageSQL;
+  }
+  
+  /**
+   * 返回查询后的记录总数
+   * @param sql
+   * @return
+   * @throws Exception
+   */
+  private int getRowCount(final String sql) throws Exception {
+  	RowSet rows = geneDao.executeQuery("select count(*) row_count from ("+sql+")");
+  	int rowcount=0;
+  	if (rows.next()) {
+  		rowcount = rows.getInt("row_count");
+  	}
+  	return rowcount;
+  }
+  
+  
+	private String getFieldsType(Field field){
+		String strFieldType = field.getName().substring(field.getName().lastIndexOf(".")+1);
+		Class c = field.getType();
+		strFieldType = c.getName().substring(c.getName().lastIndexOf(".")+1);	
+		return strFieldType;
+	}
+
+	
+	/*
+	 * 获取excel开始真正读取记录行号
+	 */	
+private Map getLoginDept(HttpServletRequest request){
+	  String userid=(String)request.getSession().getAttribute(AppConstants.SESSION_USERID);		
+	  Map	map=new HashMap();
+		if(userid!=null){
+			userid=userid.trim();
+		      String sql="select  k.dept_id,d.dept_simlename from  kpi_user k,dm_dim_deptinfo d where " 
+		      		     +"  k.userid='"+userid+"' and d.dept_id=k.dept_id";
+		      try{
+		    	  RowSet rs=geneDao.executeQuery(sql, null);
+		    		while(rs.next()){  			
+		    			map.put("dept_id", rs.getString("dept_id"));
+		    			map.put("dept_name", rs.getString("dept_simlename"));
+		    		}
+		      }
+			catch(Exception e){
+			  	e.printStackTrace();
+			}
+			return map;		
+		   }
+		else return null;		
+		 
+	}
+
+
+/*
+ * 获取excel开始真正读取记录列号
+ */	
+private String getExcelCol(int col){
+  		char c='A';
+  		String str_col=null;
+  		if(col<=26){
+  			c+=col;
+  	  		str_col=String.valueOf(c);
+  		}
+  		else {
+  			c+=col-26;
+  			str_col="A"+String.valueOf(c);
+  		}
+  		return str_col;	 
+  }
+
+/*
+ * 重写Excel内容操作
+ * param用户重写内容SelfProperty
+ */
+private String  updateExcel(String path,List<SelfProperty> list )throws Exception{
+	FileInputStream in = new FileInputStream(path);
+	try{
+	  Sheet sheet=getExcelSheet(in);
+	  int rows=this.getFactEndRow(sheet);
+	 // if(list.size()>0){//需要修改
+    for(int e=0;e<list.size();e++){
+	    SelfProperty sp=list.get(e);
+	    int col=-1;
+	    if("int".equals(sp.getFiledType())){
+	    	col=Integer.parseInt(sp.getKeyName());//可以是字段名,可以是数字表示列名或列号
+	    }
+		  for(int i=getFactStartRow(sheet);i<=rows;i++){
+			  Row row=sheet.getRow(i);
+			  if(col>0||col==0){
+				  Cell cell=row.getCell(col);
+				  cell.setCellValue(sp.getValue());  
+			  }
+			 
+		  }	
+		   int num_end=path.lastIndexOf(".");
+		   path=path.substring(0, num_end)+"用户使用"+".xls";
+		   FileOutputStream fileoutputstream = new FileOutputStream(path);
+           wb.write(fileoutputstream);
+		
+	  }
+	 
+	}
+	catch(Exception e){
+		e.printStackTrace();
+	}
+	finally{
+		
+	}
+ return path;
+}
+/*
+ * 将单元格内容转化为字符
+ * 
+ */
+private String getCellValue(Cell cell,boolean isDigit) throws Exception{
+	String value="";
+	
+	switch(cell.getCellType()){	
+	case HSSFCell.CELL_TYPE_NUMERIC: //Cell.CELL_TYPE_NUMERIC:
+			//读取日期格式
+			if (HSSFDateUtil.isCellDateFormatted(cell)) {//日期类型
+				double d = cell.getNumericCellValue();
+				Date date = HSSFDateUtil.getJavaDate(d);
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String time = df.format(date);
+				Timestamp ts = Timestamp.valueOf(time);
+				value=ts.toString();
+				value=value.substring(0, 19);
+			}else {//数字类型
+				//dataMap.put(headCodes[j], cell.getNumericCellValue());
+		    	value=String.valueOf(cell.getNumericCellValue());			
+			}
+		break;		
+	case HSSFCell.CELL_TYPE_STRING:
+		//读取String
+		value=cell.getRichStringCellValue().toString();	
+		break;
+	case HSSFCell.CELL_TYPE_FORMULA:
+		value = "" + cell.getNumericCellValue();
+		break;
+	default:
+		
+		break;
+			
+			
+    }
+  
+	 Pattern p = Pattern.compile("^(-)?\\d+(\\.\\d+)?$");   
+     Matcher matcher = p.matcher(value);
+     if(!StringUtils.isEmpty(value)
+    		 &&matcher.matches()){
+    	 //保留小数的位数
+    	 int scale=3;//默认保留3位
+    	 BigDecimal big= new BigDecimal(value).setScale(scale, BigDecimal.ROUND_HALF_UP); 
+    	 value=big.toString();
+     }else{
+    	 if(isDigit){
+    	   throw new Exception("空的数据列");
+    	 }else{
+    		 ;
+    	 }
+     }
+
+	return value;
+  }
+/**
+ * 获取系统时间2011/4/15周小桥
+ */
+private Timestamp getSysDate(){
+	
+		  Date sysdate=new Date();
+		  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		  String time = df.format(sysdate);
+		  Timestamp ts = Timestamp.valueOf(time);
+	  return ts;
+  }
+/**
+ *start_col:开始读取列判断
+ * 
+ */	
+	private int getStartWay(Sheet sheet,int start_col,String mark){
+		int startReadRow=-1;
+		int rows=getFactEndRow(sheet);//获取有数据的最大行数	
+		//寻找开始读取的行
+		try{
+		for(int r=0;r<rows;r++){
+			String start_read="";
+			if(sheet.getRow(r).getCell(start_col)!=null){				
+				start_read=getCellValue(sheet.getRow(r).getCell(start_col),false);
+				start_read=start_read.trim();
+			}
+			else continue ;
+			if(start_read.contains(mark)&&!start_read.contains("填报单位")){
+			       startReadRow=r;
+			      //第二种excel模板英文或拼音字段,最多合并10个行
+			    	   for(int i=r+1;i<r+9;i++){
+			    		   if(sheet.getRow(i).getCell(start_col)!=null){
+			    			   start_read=getCellValue(sheet.getRow(i).getCell(start_col),false);
+					    	   start_read=start_read.trim();
+					    	   if(start_read.contains("DGddwUnit")){
+					    		   startReadRow=i; 
+					    		   break;
+					    	   }
+					    	   else if(!"".equals(start_read))break;//合并行的单元格值为空
+					    	   startReadRow=i; 
+			    		   }
+			    		   else 
+			    			   startReadRow=i; 
+			    			  continue ;
+			    	   }			    	   			    				     
+				   break;
+			}
+		}
+		startReadRow++;
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		
+		return startReadRow;
+	}
+	/*
+	 * 字符转日期
+	 */
+
+	 private static Timestamp StringChangDate(String str){
+	      Timestamp ts=null;
+		  try{
+			  if(str!=null){
+				  str=str.trim();
+				 if(!"".equals(str)){
+				  java.sql.Date  sdt=java.sql.Date.valueOf(str); 
+				  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				  String time = df.format(sdt);
+				   ts = Timestamp.valueOf(time);
+			    }
+		     }
+			  else
+				  return null;
+
+		  }
+		  catch(Exception e){
+			 
+			  e.printStackTrace();
+			  return null ;
+		  }
+	    return ts ;
+	   }
+		
+/*
+ *判断ExceL导入的名称是否正确
+ */	
+public String checkExcelName(Sheet sheet,String excelKey){
+	String head=null;
+	try{
+     //取excel首行首列
+	  Row row_head=sheet.getRow(0);	
+	  Cell cell=row_head.getCell(0);	  
+	  String str_head=null;
+	  str_head=getCellValue(cell,false);
+	  str_head+=".xls";
+	  String name=getExcelName(excelKey);
+	  if(!str_head.equals(name)){
+		  head="导错了文件;你导入的是:"+str_head+",而不是目的文件:"+name;
+	  }
+	}
+	catch(Exception e){
+		e.printStackTrace();
+	}
+    	
+  		return head;	 
+  }
+/*
+ * 获取Excel的中文名
+ */
+ public String getExcelName(String excelKey){
+	String name=null;
+	String sql="select e.chinaName from DW_FACT_EXCELHEAD e where e.excelkey='"+excelKey+"'";
+	try{
+		RowSet rs= geneDao.executeQuery(sql);
+		if(rs.next()){
+			name=rs.getString("chinaName"); 
+			if(name!=null)name=name.trim();
+			name+=".xls";
+		   }
+	}
+	catch(Exception e){
+		e.printStackTrace();
+	}   	
+  		return name;	 
+  }
+	/*
+	  * 
+	  * 检查重复数据分2步
+	  * 针对一条数据先对excel中检查,再做数据库中检查
+	  * row=0新增检查; row=-1修改检查; 
+	  */
+	 public ErrorClass  getCheckRepeatData(FaultClass dlc,List faultList,int row,String table){
+		 ErrorClass ec=null;
+		 String excelInf=null;
+		 try{
+		 //1.检查execl重复数据
+		 if(faultList!=null&&faultList.size()>1&&dlc!=null){//有至少2有条数据,		 	
+				 for(int i=1;i<faultList.size();i++){//lowFaultList第一项存success,必须跳过第一项
+					 FaultClass obj=(FaultClass)faultList.get(i);
+					 if(dlc.getD_GDDW_UNIT().equals(obj.getD_GDDW_UNIT())&&dlc.getF_DEVICE_TYPE().equals(obj.getF_DEVICE_TYPE())&&
+						dlc.getF_FAULT_CLASS().equals(obj.getF_FAULT_CLASS())&&dlc.getF_FAULT_TYPE().equals(obj.getF_FAULT_TYPE())&&
+						dlc.getF_FIND_DATE().equals(obj.getF_FIND_DATE())&&dlc.getF_DEFECT_WAY().equals(obj.getF_DEFECT_WAY())){
+						String type="J2/J3/J4";
+						if(dlc instanceof MidFaultInf)
+							  type="J2";
+						  else if(dlc instanceof LowFault)
+							   type="J3";
+						    else if(dlc instanceof SecdFault)
+						    	 type="J4";
+						String fault="";
+						if("J".equals(dlc.getF_FAULT_TYPE()))
+							fault="紧急缺陷";
+						 else if("Z".equals(dlc.getF_FAULT_TYPE()))
+								fault="重大缺陷";
+						   else if("Y".equals(dlc.getF_FAULT_TYPE()))
+									 fault="一般缺陷";
+						 excelInf ="单位："+dlc.getF_DEPT_NAME()+
+						 " ;设备类型： "+soService.getDeviceTypeChina(dlc.getF_DEVICE_TYPE(), type)+
+						 " ;原因归类：" +soService.getFaultClassChina(dlc.getF_FAULT_CLASS())+
+						 " ;缺陷等级："+fault+
+						 " ; 发现日期："+dlc.getF_FIND_DATE()+"; " +
+						 " ;缺陷发现手段:"+ soService.getDefectWayChina(dlc.getF_DEFECT_WAY())+"有重复数据!";
+						 
+					 }
+				 }
+				 		 
+			 if(excelInf!=null){
+			   ec= new ErrorClass();
+			   ec.setRow_num(row);
+			   ec.setInf(excelInf);
+			 }
+		  }
+		  else if(excelInf==null&&dlc!=null){ //2.检查系统数据库中是否已存在的数据
+			  //excel导入,新增检查 
+		       List condition=new ArrayList();
+			   condition.add(setPropertyVal(dlc,"D_GDDW_UNIT",null));
+			   condition.add(setPropertyVal(dlc,"F_DEVICE_TYPE",null));
+			   condition.add(setPropertyVal(dlc,"F_FAULT_TYPE",null));
+			   condition.add(setPropertyVal(dlc,"F_FAULT_CLASS",null));
+			   condition.add(setPropertyVal(dlc,"F_FIND_DATE",null));
+			   condition.add(setPropertyVal(dlc,"F_DEFECT_WAY",null));
+			 if(row==-1){//修改检查
+				 condition.add(setPropertyVal(dlc,"ID","<>"));
+			    }
+			 excelInf=isExistsDB(table, condition);
+			 if(excelInf!=null){
+			      ec= new ErrorClass();
+			      ec.setRow_num(row);
+			      //本记录新增或修改
+			      if(row>0) excelInf="导入:本记录"+excelInf;
+			       else if(row==0) excelInf="新增:本记录"+excelInf;
+			          else excelInf="修改:本记录"+excelInf;
+			      ec.setInf(excelInf);
+			    }
+		     }
+		 }
+		 catch(Exception e){
+			 e.printStackTrace();
+		 }
+		 return ec;
+	   }
+	 	
+
+	/*
+	 * 主函数
+	 */
+	public static void main(String[] args){
+		// TODO Auto-generated method stub
+		ExcelManageOperate tt=new ExcelManageOperate();
+		LowFault obj=new LowFault();
+		try{
+
+		
+		 System.out.println(obj.getClass().getDeclaredField("D_GDDW_UNIT"));
+		 obj.setD_GDDW_UNIT("65656");
+		 SelfProperty p=(SelfProperty)tt.setPropertyVal( obj, "D_GDDW_UNIT",null);
+	     System.out.println(p.getValue());
+	     System.out.println(p.getFiledType());
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
+
+	public Workbook getWb() {
+		return wb;
+	}
+
+
+	public void setWb(Workbook wb) {
+		this.wb = wb;
+	}
+/*
+ *通过文件路径创建 FileItem
+ * 
+ */	
+	/*
+	private FileItem createFileItem(String filePath)
+    {
+        FileItemFactory factory = new DiskFileItemFactory(16, null);
+    
+        int num = filePath.lastIndexOf(".");
+        String textFieldName =filePath.substring(0, num) ;
+        String extFile = filePath.substring(num);
+        System.out.println("textFieldName==="+textFieldName);
+        System.out.println("extFile==="+extFile);
+        FileItem item = factory.createItem(textFieldName, "text/plain", true,extFile);
+        File newfile = new File(filePath);
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        try
+        {
+            FileInputStream fis = new FileInputStream(newfile);
+            OutputStream os = item.getOutputStream();
+            while ((bytesRead = fis.read(buffer, 0, 8192))
+                != -1)
+            {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            fis.close();
+        }
+        catch (IOException e)
+        {
+            //fail("Unexpected IOException" + e);
+        }
+
+        return item;
+
+    }
+*/
+}

@@ -1,0 +1,91 @@
+package com.kt.kpi.fixreport.util;
+
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class UsualTool {
+	/*
+	 * 年月-转年月日
+	 * 
+	 */
+	public static SimpleDateFormat dateFormat_StringToDate = new SimpleDateFormat("yyyy-MM-dd");
+	public static Date YeaMonToDate(String date) {
+		if (date == null || date.equals(""))
+			return null;
+		java.util.Date newStartTime = null;
+		try {
+			if(date.length()<8){
+				newStartTime = dateFormat_StringToDate.parse(date+"-01");				
+			}
+			else newStartTime = dateFormat_StringToDate.parse(date);
+		} catch (ParseException e) {
+
+			e.printStackTrace();
+		}
+
+		return newStartTime;
+	}
+	/*
+	 * 字符转Timestamp日期2011/4/13周小桥
+	 */
+
+	 public static Timestamp StringChangDate(String str){
+	      Timestamp ts=null;
+		  try{
+		  if(str!=null){
+			 str=str.trim();
+			 if(!"".equals(str)){
+				if(str.length()>9&&str.length()<19){
+					  str=str.substring(0, 10);
+					  java.sql.Date  sdt=java.sql.Date.valueOf(str); 
+					  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					  String time = df.format(sdt);
+					  ts = Timestamp.valueOf(time);
+				
+				 }			  
+				 else if(str.length()>=19) {
+					    str=str.substring(0, 19);
+					    ts= Timestamp.valueOf(str);
+					   
+				  }
+				else   return null;
+			    }
+		     }
+			  else
+				  return null;
+		  }
+		  catch(Exception e){
+			  e.printStackTrace();
+		  }
+	    return ts ;
+	   }
+	 
+		/*
+	   * 如果时间字符为空取系统时间2011/4/12周小桥
+	   */
+	 public String getSysDateStr(String str){
+		  if(str!=null)str=str.trim();
+		  if(str==null||"".equals(str)){
+			  Date sysdate=new Date();
+			  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			  String time = df.format(sysdate);
+			  Timestamp ts = Timestamp.valueOf(time);
+			  str=ts.toString().substring(0,9); 
+		  }
+		
+		  return str;
+	  }
+	  /*
+	   * 获取系统时间2011/4/15周小桥
+	   */
+	 public Timestamp getSysDate(){
+	 	
+	 		  Date sysdate=new Date();
+	 		  SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	 		  String time = df.format(sysdate);
+	 		  Timestamp ts = Timestamp.valueOf(time);
+	 	  return ts;
+	    }
+}

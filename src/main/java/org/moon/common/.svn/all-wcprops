@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svn/!svn/ver/6882/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util
+END
+ErrorClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/svn/!svn/ver/6309/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/ErrorClass.java
+END
+SelectOperate.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/!svn/ver/5952/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/SelectOperate.java
+END
+EntityFactory.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/!svn/ver/6465/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/EntityFactory.java
+END
+SearchOperate.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/!svn/ver/6847/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/SearchOperate.java
+END
+UsualTool.java
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn/!svn/ver/5587/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/UsualTool.java
+END
+ExcelManageOperate.java
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svn/!svn/ver/6932/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/ExcelManageOperate.java
+END
+ClientDataPro.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/!svn/ver/6939/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/ClientDataPro.java
+END
+ProduceSetEntity.java
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn/!svn/ver/6533/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/ProduceSetEntity.java
+END
+CheckBoxClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/!svn/ver/5286/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/CheckBoxClass.java
+END
+MidFaultExcelObject.java
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/svn/!svn/ver/6932/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/MidFaultExcelObject.java
+END
+SelfProperty.java
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn/!svn/ver/6032/2010/%E7%9C%81%E5%85%AC%E5%8F%B8/%E4%BB%A3%E7%A0%81/beta/3.0/GDKPI/src/com/kt/kpi/fixreport/util/SelfProperty.java
+END
