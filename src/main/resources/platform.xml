@@ -18,16 +18,16 @@
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName">
-			<value>${driverClassName}</value>
+			<value>com.mysql.jdbc.Driver</value>
 		</property>
 		<property name="url">
-			<value>${db_url}</value>
+			<value>jdbc:mysql://localhost:3306/test?useUnicode=true&amp;autoReconnect=true&amp;characterEncoding=UTF-8</value>
 		</property>
 		<property name="username">
-			<value>${db_userName}</value>
+			<value>root</value>
 		</property>
 		<property name="password">
-			<value>${db_passWord}</value>
+			<value>bjhit</value>
 		</property>
 		<!--connection.useUnicode 连接数据库时是否使用Unicode编码 -->
 		<property name="Connection.useUnicode">

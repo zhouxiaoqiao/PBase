@@ -1,6 +1,0 @@
-#scrollContainer{
-    margin-left:10pt;
-	margin-top:2pt;
-	overflow:hidden; /* 注意，核心就在于这里，它把溢出的内容隐藏起来  */
-	text-align: left;
-}

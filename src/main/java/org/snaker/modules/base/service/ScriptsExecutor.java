@@ -51,7 +51,7 @@ public class ScriptsExecutor {
             }
             String databaseType = JdbcHelper.getDatabaseType(conn);
             String[] schemas = new String[]{"db/core/schema-" + databaseType + ".sql",
-                    "sql/flow/web/schema-" + databaseType + ".sql", "sql/flow/init/init-data.sql","sql/hr/create_tab.sql"};
+                    "sql/flow/web/schema-" + databaseType + ".sql", "sql/flow/web/init-data.sql","sql/hr/create_tab.sql"};
             ScriptRunner runner = new ScriptRunner(conn, true);
             for(String schema : schemas) {
                 runner.runScript(schema);
