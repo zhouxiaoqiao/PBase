@@ -24,10 +24,10 @@
 			<value>${db_url}</value>
 		</property>
 		<property name="username">
-			<value>root</value>
+			<value>${db_userName}</value>
 		</property>
 		<property name="password">
-			<value>bjhit</value>
+			<value>${db_passWord}</value>
 		</property>
 		<!--connection.useUnicode 连接数据库时是否使用Unicode编码 -->
 		<property name="Connection.useUnicode">
