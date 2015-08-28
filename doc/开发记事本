@@ -64,7 +64,11 @@ default-character-set=utf8
 	   -Xrs
 	      加入 -Xms256m -Xmx512m 
 	      重起tomcat服务,设置生效
-    
+  3.5  打包发布到tomcat时:需要删除/web-inf/lib/jsp-api.jar,否则包冲突 错误: Unable to read TLD "META-INF/c.tld" 
+              开发时:可以在eclipse当中添加一个User Library(Window-->Preferences-->Java-->Build Path --> User library) 把jsp-api.jar和servlet-aip.jar 两个jar文件加入进去，一定要把下面system library 打钩， 
+                         然后在项目引入这个library编译, 这样再部署的时候就不会把这2个jar文件部署到tomcat了
+
+  
 六.自动初始化数据库
     注意:sec_menu表的最高父菜单需要将id=1690改成0
   
