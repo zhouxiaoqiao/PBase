@@ -75,7 +75,7 @@ var dept_id ='200';
 					onSelectRow : function(rowid, status) {
 						//onClickSel(rowid, status);
 					},
-					caption : "员工信息表"
+					caption : "员工信息表2"
 				});
 		jQuery("#dataTableId").jqGrid('navGrid', '#pagerId', {
 			add : false,

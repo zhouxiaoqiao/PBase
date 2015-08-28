@@ -19,6 +19,7 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jsp-api"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/chart-viewer.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/com.ibm.icu_4.4.2.v20110823.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/org.apache.batik.bridge_1.6.0.v201011041432.jar"/>
@@ -116,5 +117,6 @@
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/Tidy.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/viewservlets.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/ueditor-1.1.1.jar"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jstl-1.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
