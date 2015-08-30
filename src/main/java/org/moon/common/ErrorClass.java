@@ -1,9 +1,11 @@
 package org.moon.common;
-/*
- * @author zhouxiaoqiao
- * @EXCEL���뱨����/2011/04/02
- * @throws Exception
-*/	
+/**
+ * 	
+ * <b>版权信息 :</b> 2012，云技术有限公司<br/>
+ * <b>功能描述 :</b> <br/>
+ * <b>版本历史 :</b> <br/>
+ * @author 周小桥| 2015-8-30 上午10:25:08 | 创建
+ */
 public class ErrorClass {
   int row_num;
   String inf ;

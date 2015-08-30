@@ -141,8 +141,9 @@
 		<dependency>
 			<groupId>commons-pool</groupId>
 			<artifactId>commons-pool</artifactId>
-			<version>1.6</version>
+			<version>1.1</version>
 		</dependency>
+
 		<!-- mysql5.1.30 驱动包 -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -184,7 +185,12 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -198,11 +204,6 @@
 			<artifactId>json-lib</artifactId>
 			<version>2.4</version>
 			<classifier>jdk15</classifier><!--指定jdk版本 -->
-		</dependency>
-		<dependency>
-			<groupId>org.apache.directory.studio</groupId>
-			<artifactId>org.apache.commons.codec</artifactId>
-			<version>1.8</version>
 		</dependency>
 		<!-- httl 核心jar包 -->
 		<dependency>
@@ -400,7 +401,7 @@
 						<scanIntervalSeconds>2</scanIntervalSeconds>
 					</configuration>
 				</plugin>
-             <!-- 使用birt需要jar包 -->
+				<!-- 使用birt需要jar包 -->
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>

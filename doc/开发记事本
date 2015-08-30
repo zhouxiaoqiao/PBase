@@ -23,7 +23,7 @@ default-character-set=utf8
  
  三.birt  
   1.birt
-	    将birt-charts\DeploymentRuntime\ChartEngine下的所有jar文件复制到Tomcat的common\lib下面。
+	    将birt-charts\DeploymentRuntime\ChartEngine下的所有jar文件复制到Tomcat的common\lib下面（通过eclipse部署到tomcat上时不需要）。
 	    将birt-charts\3_7_2\WebViewerExample\WEB-INF\lib下的所有文件复制到 工程名\WEB-INF\lib下面。
 	    创建工程时需要导入tomcat/lib下所有jar包	.
 	    注意:birt-runtime与 birt-charts版本一致,本程序用的birt版本是3.7.2	 
@@ -83,3 +83,4 @@ default-character-set=utf8
   2.提交程序时不要提交 webRoot/WEB-INF/lib文件(jar包太大);所以先移出 ,提交或下载完毕后把lib文件移入;先项目清理然后项目刷新
   3.上传下载地址:https://github.com/zhouxiaoqiao/PBase.git
   4.如果 maven编译后未生成lib文件需要在项目属性的Deloypment Assembly  重新 maven dependencies 
+  5.maven打包时出现[ERROR] 符号： 方法 encodeBase64URLSafeString(byte[])；需将commons-codec-1.9放入、web-inf/lib下
