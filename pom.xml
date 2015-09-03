@@ -141,9 +141,8 @@
 		<dependency>
 			<groupId>commons-pool</groupId>
 			<artifactId>commons-pool</artifactId>
-			<version>1.1</version>
+			<version>1.6</version>
 		</dependency>
-
 		<!-- mysql5.1.30 驱动包 -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -177,19 +176,10 @@
 			<artifactId>struts2-spring-plugin</artifactId>
 			<version>${struts2.version}</version>
 		</dependency>
-
-
-		<!-- struts 标签库 -->
 		<dependency>
 			<groupId>jstl</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>2.1</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -198,12 +188,24 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- 公共包或其他包 -->
 		<dependency>
 			<groupId>net.sf.json-lib</groupId>
 			<artifactId>json-lib</artifactId>
 			<version>2.4</version>
 			<classifier>jdk15</classifier><!--指定jdk版本 -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.directory.studio</groupId>
+			<artifactId>org.apache.commons.codec</artifactId>
+			<version>1.8</version>
 		</dependency>
 		<!-- httl 核心jar包 -->
 		<dependency>
@@ -271,6 +273,12 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
+		</dependency>
+		<!-- fastJson -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.1.24</version>
 		</dependency>
 		<!-- POI word excel 操作 -->
 		<dependency>
