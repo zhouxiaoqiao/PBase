@@ -1,6 +1,5 @@
 package org.snaker.framework.security.web;
 import javax.servlet.http.HttpServletRequest;
-import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.shiro.SecurityUtils;
@@ -9,7 +8,6 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
-import org.moon.service.MainService;
 import org.snaker.framework.security.entity.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class LoginController {
 	private static Log log = LogFactory.getLog(LoginController.class);
-	private MainService ms = new MainService();
 	@RequestMapping(value = "/login" ,method = RequestMethod.POST)
 	public String login(User user, Model model, HttpServletRequest request) {
 		log.info("Login user=====" + user);
@@ -38,15 +35,15 @@ public class LoginController {
 		    	}
 			subject.login(token);
 		
-			String path = request.getContextPath();
-			String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-					+ path + "/";
-			JSONObject jsonObj = new JSONObject();
-			jsonObj = ms.getMenuToHtm(user.getUsername(), "0", basePath, user.getUsername());	
-			request.getSession().setAttribute("strSub", jsonObj.getString("strSub"));
-			request.getSession().setAttribute("menuLen", jsonObj.getInt("menuLen"));//
-			request.getSession().setAttribute("userName", user.getUsername());
+			//String path = request.getContextPath();
+			//String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+			//		+ path + "/";
+			//JSONObject jsonObj = new JSONObject();
+			//jsonObj = ms.getMenuToJson(user.getUsername(), "0", basePath, user.getUsername());	
+			//request.getSession().setAttribute("strSub", jsonObj.getString("strSub"));
+			//request.getSession().setAttribute("menuLen", jsonObj.getInt("menuLen"));//
 			request.getSession().setAttribute("user_id", user.getUsername());
+			request.getSession().setAttribute("userName", user.getFullname());
 		 		 
 			return "redirect:/index";
 		} catch(UnknownAccountException ue) {

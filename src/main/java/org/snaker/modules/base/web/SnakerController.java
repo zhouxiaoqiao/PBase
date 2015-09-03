@@ -278,11 +278,12 @@ public class SnakerController
 			facets.getEngine().task()
 					.withdrawTask(taskId, ShiroUtils.getUsername());
 			returnMessage = "任务撤回成功.";
+			//returnMessage = java.net.URLEncoder.encode(returnMessage,"UTF-8");
 		} catch (Exception e)
 		{
 			returnMessage = e.getMessage();
 		}
-		model.addAttribute("returnMessage", returnMessage);
+			model.addAttribute("returnMessage", returnMessage);
 		return "redirect:/snaker/task/history";
 	}
 

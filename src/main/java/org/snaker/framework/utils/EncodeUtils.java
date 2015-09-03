@@ -31,7 +31,7 @@ public class EncodeUtils {
 	 * Hex编码.
 	 */
 	public static String hexEncode(byte[] input) {
-		return  Hex.encodeHexString(input);
+		return Hex.encodeHexString(input);
 	}
 
 	/**
