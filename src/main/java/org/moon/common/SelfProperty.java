@@ -1,10 +1,8 @@
 package org.moon.common;
 /**
  * 
- * <b>版权信息 :</b> 2012，云技术有限公司<br/>
- * <b>功能描述 :</b> <br/>
- * <b>版本历史 :</b> <br/>
- * @author 周小桥| 2015-8-30 上午10:25:33 | 创建
+ * @author Administrator
+ *
  */
 public class SelfProperty {
   public String keyName ;

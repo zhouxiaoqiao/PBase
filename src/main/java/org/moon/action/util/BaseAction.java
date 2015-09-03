@@ -13,6 +13,8 @@ import net.sf.json.JSONObject;
 
 import org.apache.struts2.ServletActionContext;
 
+import com.alibaba.fastjson.JSON;
+
 
 
 public class BaseAction  
@@ -37,12 +39,13 @@ public class BaseAction
 	{
 		try
 		{
-			ServletActionContext.getResponse().setContentType(
-					"text/html;charset=utf-8");
-		 
+			ServletActionContext.getResponse().setContentType("text/html;charset=utf-8");
+			ServletActionContext.getResponse().getWriter()
+					.write(JSON.toJSONStringWithDateFormat(json, "yyyy-MM-dd HH:mm:ss"));
 			ServletActionContext.getResponse().getWriter().flush();
 			ServletActionContext.getResponse().getWriter().close();
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -66,7 +69,6 @@ public class BaseAction
 		writer.flush();
 		writer.close();
 	}
-
 	/**
 	 * @return
 	 * @author 周小桥 |2015-6-25 上午10:02:35

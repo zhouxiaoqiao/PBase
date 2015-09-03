@@ -11,14 +11,12 @@ import org.springframework.stereotype.Service;
 public class SelectOperate {
 	 private MDBTool geneDao=new MDBTool();
 
-/**
- * 
- * @param excelValue
- * @return
- * @throws Exception
- * @author 周小桥 |2015-8-30 上午10:25:55
- * @version 0.1
- */
+	/**
+	 * ���ȱ��ԭ�����2011/4/2��С��
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
 	@SuppressWarnings("rawtypes")
 	public String getFaultClassExcel(String excelValue)throws Exception  {	
 		String sql="SELECT p.xl_id,p.xl_name FROM dw_dim_gddw_pdqxyyxl p";
