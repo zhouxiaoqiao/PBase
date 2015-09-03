@@ -75,7 +75,7 @@ var dept_id ='200';
 					onSelectRow : function(rowid, status) {
 						//onClickSel(rowid, status);
 					},
-					caption : "员工信息表2"
+					caption : "应聘者信息"
 				});
 		jQuery("#dataTableId").jqGrid('navGrid', '#pagerId', {
 			add : false,
@@ -87,7 +87,7 @@ var dept_id ='200';
 	});
 </script>
 </head>
-<body onload="initUserWin()">
+<body>
 	<table id="dataTableId"></table>
 	<div id="pagerId" class="scroll"></div>
 	<input type="hidden" id="method" value="">
