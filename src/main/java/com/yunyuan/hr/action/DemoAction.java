@@ -184,7 +184,7 @@ public class DemoAction  {
 			setPageParm(request);
 			sql = request.getParameter("sql");
 			if (sql == null || "".equals(sql) || "null".equals(sql))
-				sql = "SELECT t.*,d.name as  dept_name from tab_employee t,tab_dept d where t.dept_id=d.dept_id ";
+				sql = "SELECT t.*,d.name as  dept_name from tab_employee t,sec_org d where t.dept_id=d.id ";
 			if (sortname != null && !"".equals(sortname)) {
 				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
 			} else
