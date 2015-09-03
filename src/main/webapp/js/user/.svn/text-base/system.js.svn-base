@@ -1,0 +1,597 @@
+
+/*
+  控制action转向
+*/
+function goWithButton(url) {
+  document.forms[0].action=url;
+  document.forms[0].submit();
+ }  
+// 
+function refreshdata() {  
+  if (window.opener) {
+     window.opener.document.forms[0].action.value = "switchuserno";
+     window.opener.document.forms[0].submit();
+  }
+  window.close();
+}
+
+ function printMingReportInDialog(){
+    var screenHeight=window.screen.height;;
+    var screenWidth=window.screen.width;
+    var dialogStyle="dialogHeight:"+screenHeight+"px;dialogWidth:"+screenWidth+"px;dialogTop:0px;dialogLeft:0px;status:no;scroll:no";
+    window.showModalDialog("/WebRoot/printMingReport.jsp",null,dialogStyle);
+    //document.forms[0].bt_query.click();
+ }
+
+
+ /*--------------------------------------------------------------打开一个窗口---------------------------------------------------------*/  
+  function closeWin() { 
+    window.close();
+   }
+ function open_window(url,win_name,width,height) {
+  var showx = (window.screen.availWidth-width)/2;
+  var showy = (window.screen.availHeight-height)/2;
+  var window_name = window.location.href;
+  if(win_name=='') {
+    window_name=window_name.split("?")[0];
+    window_name=window_name.split("/")[window_name.split("/").length-1];
+    window_name=window_name.split(".")[0];
+  } else
+  window_name=win_name;
+  var win = window.open(url, window_name, "width="+width+",height="+height+",top="+showy+",left="+showx+",menubar=no,scrollbars=yes,toolbar=no,resizable=yes,status=no");
+  win.focus();
+}
+/*--------------------------------------------------------------操作XMLHttp---------------------------------------------------------*/  
+/*
+
+*/
+ function createXMLHttp()
+ {    var xmlhttp;
+		try {
+			this.xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+		} catch (e) {
+			try {
+				this.xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			} catch (err) {
+				this.xmlhttp = null;
+			}
+		}
+		if(!this.xmlhttp && typeof XMLHttpRequest != "undefined")
+			this.xmlhttp = new XMLHttpRequest();
+		if (!this.xmlhttp){
+			this.failed = true; 
+		}
+		xmlhttp=this.xmlhttp;
+	    xmlhttp.onreadystatechange=callBack;
+	    return xmlhttp;
+	}
+ function createXMLHttp1(){
+   var xmlhttp;
+ if(window.XMLHttpRequest)
+ {
+    xmlhttp=new window.XMLHttpRequest();
+   if(xmlhttp.overrideMimeTpye){
+      xmlhttp.overrideMimeTpye("text/xml");
+    }
+   }
+  else if(window.ActiveXObject){//
+       var activexName=new ['MSXML2.XMLHTTP.6.0','MSXML2.XMLHTTP.3.0','MSXML2.XMLHTTP','Microsoft.XMLHTTP'];
+       for(var i=0;i<activexName.length;i++){
+       try{
+       	   xmlhttp= new ActiveXObject(activexName[i]);
+            break;
+           }
+           catch(e){
+
+           }
+       }
+   }
+ if (!xmlhttp){
+   alert("xmlhttp unsuccessfull");
+   return false ;
+   }
+    xmlhttp.onreadystatechange=callBack;
+     return xmlhttp;
+ }
+/*--------------------------------------------------------------增加下拉框选项---------------------------------------------------------*/  
+ function addSelect(str,name){
+   var  j=0;
+   var t_str=""; 
+   var nameSelect =document.getElementById(name);
+   var length=document.getElementById(name).length;
+   //init
+   for(var t=0;t<length;t++){
+     nameSelect.remove(i);
+   }
+   
+   // 
+   for ( var i = 0; i < str.length; i ++ ) 
+   { 
+    if (str.charAt(i)=='*'){
+       if(j==0)
+           t_str=str.substr(j,i-j);
+        else 
+         t_str=str.substr(j+1,i-j-1);
+        
+        j=i;
+        var op = window.document.createElement("option");               
+        op.value = t_str;                            
+        op.innerHTML =t_str;
+        nameSelect.appendChild(op);
+        
+    }
+   } 
+ 
+ }
+ /*--------------------------------------------------------------jsp对象值操作:字符判断，获得字符长度---------------------------------------------------------*/ 
+ function len(s) {
+  s=stringTrim(s);
+   var l = 0;
+   var a = s.split("");
+    for (var i=0;i<a.length;i++) {
+        if (a[i].charCodeAt(0)<299) {
+         l++;
+       } else {
+              l+=2;
+          }
+   }
+ return l;
+ }
+ //去空格
+ function stringTrim(s) {
+  
+   s=s.replace(/[ ]/g,""); 
+   
+    return s;
+}
+
+//判断数字型
+function isNumber(str){
+    for(var i=0; i<str.length; i++)
+          {
+            if(str.charAt(i)<'0' || str.charAt(i)>'9')
+               {          
+                return false;
+                }
+          }
+       return true;
+   }
+ //判断jsp对象值是否空
+function retIsNull(id,chinName){
+  id='#'+id;
+  var value=$(id).val();
+    if(value==undefined|| value==''){          
+                return chinName+':是空值！';
+            }       
+     else  
+        return ;
+   }  
+/*--------------------------------------------------------------按字符分离字符串---------------------------------------------------------*/    
+ function separateString(str, c){
+   str=stringTrim(str);
+   var colon=0;
+   var colons = new Array(2); 
+      for(var i=0; i<str.length; i++)
+          {
+            if(str.charAt(i)==c)
+               {          
+                colon= i;
+                break;
+                }
+          }          
+        colons[0]=  str.substr(0,colon);
+		colons[1]=str.substr(colon+1,str.length);   
+		return  colons;
+   }
+   //输入时间字符串获取小时和分钟
+ function separateStringTime(str){
+   str=stringTrim(str);
+   var c=':';
+   var china='：';
+   var colon=0;
+   var colons = new Array(2); 
+      for(var i=0; i<str.length; i++)
+          {
+            if(str.charAt(i)==c||str.charAt(i)==china)
+               {          
+                colon= i;
+                break;
+                }
+          }
+      if(colon>0){  //:必须存在字符中         
+        colons[0]=  str.substr(0,colon);
+        colons[1]=str.substr(colon+1,str.length); 
+        if(!isNumber(colons[0])||!isNumber(colons[1])){
+           alert(" 输入的非数字字符");
+          return false ;
+        }
+       var hour= parseInt(colons[0]);
+       var mit= parseInt(colons[1]);
+		  if(hour>23||mit>=60){
+           alert(" 输入了不合法的时间");
+          return false ;
+        }  
+		return  colons;
+	 }
+	else {
+	      alert(" 中间没有：隔开,非时间格式");
+	     return  false;
+	  }
+   }
+    //比较2个时间字符窜大小
+   function cmpStringTime(str1,str2){
+    var cmp=false;
+    var a1=separateStringTime(str1);
+    var a2=separateStringTime(str2);
+    var a1_hour=0;
+    var a1_mit=0;
+    var a2_hour=0;
+    var a2_mit=0;
+    if(a1&&a2){
+       a1_hour=parseInt(a1[0]);
+       a2_hour=parseInt(a2[0]);
+       a1_mit=parseInt(a1[1]);
+       a2_mit=parseInt(a2[1]);
+      if(a1_hour>a2_hour||(a1_hour==a2_hour&&a1_mit>=a2_mit)) cmp=true;
+      
+    }    
+      return cmp;   
+    }
+    
+/*--------------------------------------------------------------增加年月下拉框项---------------------------------------------------------*/    
+function addDateOption(object,dateType){
+        var selectObj =object;  
+        var now= new Date();   
+        var year=now.getYear();   
+        var month=now.getMonth()+1;
+        object.length=0;      
+      if(dateType=='year'){ 
+       for(var i=year-10;i<year+10;i++){
+           var op = window.document.createElement("option");          
+           op.value = i;                            
+           op.innerHTML =i+'年';
+           selectObj.appendChild(op);
+           if(i==year){
+                op.selected=true; 
+                } 
+               
+          }
+          var yer_null = window.document.createElement("option");          
+           yer_null.value = '';                            
+           yer_null.innerHTML ='---空---';
+           selectObj.appendChild(yer_null);
+       }
+      else  if(dateType=='month'){
+          for(var i=1;i<13;i++){
+           var op = window.document.createElement("option");
+           if(i<10){
+            op.value ='0'+ i; 
+            }        
+           else    op.value = i;                            
+           op.innerHTML =i+'月';
+           selectObj.appendChild(op);
+            if(i==month){
+                op.selected=true; 
+                }
+          }
+           var mon_null = window.document.createElement("option");          
+           mon_null.value = '';                            
+           mon_null.innerHTML ='---空---';
+           selectObj.appendChild(mon_null);
+      }
+  } 
+/*-------------------------------------------------------------- 判断选择日期是否空---------------------------------------------------------*/     
+function isDateNull(){
+    var date_inf='';
+  if($("#beginTime_year").val()==''&&$("#beginTime_month").val()==''&&$("#endTime_year").val()==''&&$("#endTime_month").val()==''){
+  
+   }
+   else {
+    if($("#beginTime_year").val()==''&&$("#beginTime_month").val()!=''){
+      date_inf='开始日期年没有选择;';
+    }
+    if($("#beginTime_year").val()!=''&&$("#beginTime_month").val()==''){
+      date_inf+='开始日期月没有选择;';
+    }
+     if($("#endTime_year").val()==''&&$("#endTime_month").val()!=''){
+      date_inf+='结束日期年没有选择;';
+    }
+    if($("#endTime_year").val()!=''&&$("#endTime_month").val()==''){
+      date_inf+='结束日期月没有选择;';
+    } 
+   }   
+      return date_inf;
+   
+   }
+   
+   function getAbsolutePos(element){
+     var _out = {left:0, top:0}
+     var _o = element;
+     while(_o){
+       _out.left += _o.offsetLeft;
+       _out.top += _o.offsetTop;
+       _o = _o.offsetParent;
+       }
+          return _out;
+      }
+
+   
+   function setYerMon(obj,basePath){
+      var tt=getAbsolutePos(obj);
+      var left=tt.left+50 ;
+      var top=tt.top+50;
+      var url=basePath+'js/view/jgUtil/selYeaMon.html';
+      var ym= window.showModalDialog(url,null,'dialogWidth=150px;dialogHeight=30px;titlebar=no;status=0;dialogLeft='+left+';dialogTop='+top);
+       obj.value=ym;
+      
+   }
+
+/*-------------------------------------------------------- 初始化年月--统计日期（组件）-------------------------------------------------------*/      	  	  
+   function initStaticTime(keyDate){ 
+    keyDate='#'+keyDate;
+   	$(function(){
+	$(keyDate).datepick({onShow: $.datepick.monthOnly,dateFormat: 'yyyy-mm',showTrigger: '#calImg'});	
+	$(keyDate).datepick({minDate: '-2yy -2w', maxDate: '+2yy +1m +2w +3d',showTrigger: '#calImg'});	
+     });
+    } 
+/*--------------------------------------------------------日期时间选择（组件）-------------------------------------------------------*/       
+   function selectTime(keyDate){ 
+     keyDate='#'+keyDate;      
+        $(function() {		
+		$( keyDate ).datepicker({
+			//defaultDate: "+5D",
+			minDate: "2008-01-01",
+			//maxDate: "+3y",
+			constrainInput:true, 
+			//changeMonth: true,
+			//changeYear: true,
+			yearRange: '-3:+2'
+			//	showButtonPanel:true
+			//showOn: "button"
+			//buttonImage: "images/calendar.gif",
+			//buttonImageOnly: false,
+			
+			//showOtherMonths: true,
+			//selectOtherMonths: false
+		});
+	 });
+    }
+/*--------------------------------------------------------初始化登录人部门-------------------------------------------------------*/    
+    function initLoginDept(pagId){//jqgrid方式
+      pagId='#'+pagId;
+      var usedata=jQuery(pagId).getUserData(); //后台需要相应的程序配置：clientDataPro.setLoginDept(request,jsonObj);
+				var loginDept_id=usedata.loginDept_id;
+				var loginDept_name=usedata.loginDept_name;
+				if($('#deptId').val()==''){//初始态，如果查询过就不用初始部门
+				  $('#deptId').attr('value',loginDept_id);
+				  $('#deptName').attr('value',loginDept_name);				
+				 }
+				if($('#deptIdExcel').val()==''){//初始态，如果查询过就不用初始部门
+				  $('#deptIdExcel').attr('value',loginDept_id);				
+				  $('#deptNameExcel').attr('value',loginDept_name); 
+				 }					 
+       }
+   function initLoginDept_tab(deptId,deptName){//table方式
+                //deptName=encodeURI(deptName);
+				if($('#deptId').val()==''&&(deptId!=''||deptId!= "undefined")){//初始态，如果查询过就不用初始部门
+				  $('#deptId').attr('value',deptId);
+				  $('#deptName').attr('value',deptName);
+				 }	
+				 
+				 if($('#deptIdExcel').val()==''&&(deptId!=''||deptId!= "undefined")){//初始态，如果查询过就不用初始部门
+				  $('#deptIdExcel').attr('value',deptId);
+				  $('#deptNameExcel').attr('value',deptName); 
+				 }			 
+        } 
+/*--------------------------------------------------------编辑只选择一项-------------------------------------------------------*/    
+    function editOneRow(pagId){//jqgrid方式
+      pagId='#'+pagId;
+      var mulsel=$(pagId).getGridParam('selarrrow'); 		
+		    if(mulsel.length>1){		     
+			    for(var i=mulsel.length-1;i>0;i--){
+			         $(pagId).setSelection(mulsel[i-1],false );   //选定一行			     
+			       }
+		  }
+    
+    }        
+/*--------------------------------------------------------工作流判断-------------------------------------------------------*/      
+     /*
+     审核流程提交 
+     注意：jqgrid中必须有id，state字段
+    */
+   function flowSubmitCheck(url,pageId,tabName,target,kpiId){
+       pageId='#'+pageId;
+       var drafts="";	               
+	   var data;
+	   var states="";
+	   var params="";
+	   var state="" ;
+       var mulsel=$(pageId).getGridParam('selarrrow'); 	   
+				if(mulsel.length==0){
+					alert("请选择要保存草稿的项");
+					return false;
+				}else{
+					for(var i=0;i<mulsel.length;i++){
+						data = $(pageId).jqGrid('getRowData',mulsel[i]);
+						 state = data.state;
+						if("AC_APPROVE"==target){
+							state='1';
+						}else if("AC_INPUT"==target){
+							state='0';
+						} 
+					drafts+=data.id+"|";
+						//states+=state+"|";		
+					}					
+				
+			    drafts="drafts="+drafts;
+                params	=drafts;	
+																							
+						$.ajax({
+					        url:url,
+					        type:'post',
+					        cache:false,
+					        dataType:'json',
+					        data:{params: params,
+					        	subTabName: tabName,
+					        	drafts:drafts,
+						        state:state,
+								kpiId:kpiId
+				            },
+					        success:function (data,stauts,XHR){
+					        	if(data.RESPCODE=='0000'){
+						        	if(data.flag==1){
+										alert('你还没有配置审核流程！');
+									}else if(data.flag==2){
+										alert('审核流程配置有误！');
+									}else{
+										alert("提交成功");
+										$(pageId).trigger("reloadGrid");
+									}
+							    }else{
+							    	alert('操作失败！');
+							    }
+						    }
+						 });
+				
+					}
+					
+    }
+    /*
+     审核流程退回
+     注意：jqgrid中必须有id，state字段
+    */
+  function  flowRollBack(url,pageId,tabName,kpiId){
+       pageId='#'+pageId;
+       var drafts="";	               
+	   var data;
+	   var states="";
+	   var params="";
+	   var state="" ;
+       var mulsel=$(pageId).getGridParam('selarrrow'); 	   
+				if(mulsel.length==0){
+					alert("请选择要保存草稿的项");
+					return false;
+				}else{
+					for(var i=0;i<mulsel.length;i++){
+						data = $(pageId).jqGrid('getRowData',mulsel[i]);
+				    	drafts+=data.id+"|";		
+					}									
+			    drafts="drafts="+drafts;
+                params	=drafts;              
+							var state='2';
+							$.ajax({
+						        url:url,
+						        type:'post',
+						        cache:false,
+						        dataType:'json',
+						        data:{drafts: drafts,
+						        	subTabName: tabName,
+						        	state:state,
+									kpiId:kpiId
+					            },
+						        success:function (data,stauts,XHR){
+							       if(data.RESPCODE=='0000'){
+							        	if(data.flag==1){
+											alert('你还没有配置审核流程！');
+										}else if(data.flag==2){
+											alert('审核流程配置有误！');
+										}else{
+											alert("提交成功");
+											$(pageId).trigger("reloadGrid");
+										}
+								    }else{
+								    	alert('操作失败！');
+								    }
+							    }
+							 });
+						}
+    }
+/*--------------------------------------------------------处理IE6.0时,层与下拉框问题-------------------------------------------------------*/    
+  	/*
+	**处理IE6.0时,层与下拉框问题，创建
+	*/	
+	function createframeDiv(parentDivId) {
+      if($.browser.msie && $.browser.version=='6.0'){
+      var child=parentDivId+'child';
+      var iframeHtml = '<iframe id="'+child+'" scrolling="auto" width="100%" height="100%" '
+                     + 'frameborder="0" framespacing="0" style="filter:alpha(opacity:0);'
+                     + 'opacity:0;left:0px;top:0px;position:absolute;z-index:1;"></iframe>';
+              $('#'+parentDivId).append(child);
+         
+      }
+    } 
+    /*
+	**处理IE6.0时,层与下拉框问题，删除
+	*/	
+	function removeframeDiv(parentDivId) {
+	 var child=parentDivId+'child';
+   //获取以前的查询窗口对象
+      var searchObj = document.getElementById(child);
+  //如果对应id的组件已经存在则将其删除
+      if (null != searchObj && typeof(searchObj) != "undefined") {
+          $("#"+child).remove();
+          } 
+      } 
+/*------------------------------------------------导入excel操作-----------------------------------------------------------------------*/ 
+ 	/*
+ 	 *jsp页面必须要有exportForm组件，importTr表
+ 	
+ 	*/
+ 	//第一步
+ 	function openImport(){
+ 	   document.getElementById('importTr').style.display="";
+ 	}
+ 	//第二步
+ 	function importData(url,deptId,files){
+ 	   var inf='';
+        if(deptId==''){
+         inf="部门不能为空,请选择部门!"        
+        }
+        if(files=='') {
+           inf=inf+"导入路径不能为空!";
+         }
+        if(inf!=''){
+           alert(inf);
+           return false;
+         }
+	     var path=encodeURI(encodeURI(files));
+         url=url+"&path="+path+"&deptId="+deptId;	    
+		 document.getElementById("exportForm").action = url;
+	 	 document.getElementById("exportForm").submit(); 
+ 	}
+  	//第三步
+ 	function closeImport(){
+ 	   document.getElementById('importTr').style.display="none";
+ 	}   
+    //第四步展示错误信息  
+    function excelErrInf(url,pageId){                          
+			window.showModalDialog(url,null,'dialogWidth=600px;dialogHeight=300px');
+		    $("#"+pageId).trigger("reloadGrid"); 
+   } 
+ /*------------------------------------------------------------------前台查询数据设置条件-------------------------------*/
+    function getQueryWhere(do_date,deptId,deptName){
+     deptName=encodeURI(deptName);
+     var url='/GDKPI/view/fixreport/fix_query.jsp?do_date='+do_date+"&deptId="+deptId+"&deptName="+deptName;
+     var returnValue= window.showModalDialog(url,window,'dialogWidth=450px;dialogHeight=250px');
+       return returnValue;
+    }
+     //arr = returnValue.split("-");
+     //  window.location.reload(); 
+     //window.location.href='/GDKPI/view/fixreport/defendPlanComplViewQuery.jsp';
+     //document.referrer;
+     //window.parent.document.getElementById('cc').innerHTML='dddddddd';   
+/*------------------------------------------------------------------前台高亮显示刚刚更新过的数据-------------------------------*/
+   
+   	function setLightData(pageId){
+   		  var  rowid = $( pageId ).jqGrid('getRowData',4,false)
+   		  var rs=$(pageId).jqGrid('getGridParam','rowNum') ;
+   		//  alert(rs);
+		  for(var i=0;i<20;i++){
+				 var data =  $( pageId ).jqGrid('getRowData',i,false)
+				  var light=data.light;	
+				 // alert(light);
+				  if(light=='1'){
+			         $(pageId).setSelection(i,true);   //选定一行			
+					}		  
+		      }
+		}

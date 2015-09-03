@@ -36,7 +36,7 @@
 			colNames:['序号','员工名','年龄','入职日期','毕业院校','职业状态','毕业时间','部门名','部门','薪资','工作经验'],
 			colModel:[						
 				{name:'eid',index:'rowindex',sortable:false,editable:false,width:30,hidden:true},				
-				{name:'name',index:'name',sortable:true,editable:true,width:30,editable:true,editoptions:{readonly:false,rows:"1",cols:"65"}},
+				{name:'staff_name',index:'staff_name',sortable:true,editable:true,width:30,editable:true,editoptions:{readonly:false,rows:"1",cols:"65"}},
 				{name:'age',index:'age',sortable:true,editable:true,width:30},
 				{name:'join_time',index:'join_time',sortable:true,editable:true,width:30},
 				{name:'college',index:'college',sortable:true,editable:true,width:30},

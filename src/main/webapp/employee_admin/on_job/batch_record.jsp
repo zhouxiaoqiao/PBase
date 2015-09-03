@@ -77,7 +77,7 @@ PageUtil pu=new PageUtil(request,action);
 	});
 </script>
 </head>
-<body onload="initUserWin()">
+<body>
 	<table id="dataTableId"></table>
 	<div id="pagerId" class="scroll"></div>
 	<input type="hidden" id="method" value="">
