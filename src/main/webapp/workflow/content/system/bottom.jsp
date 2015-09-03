@@ -19,6 +19,6 @@ body {
 </head>
 
 <body>
-	<div align="center">版权所有 *云源科技2014年6月</div>
+	<div style="text-align:center">版权所有 *云源科技2014年6月</div>
 </body>
 </html>
