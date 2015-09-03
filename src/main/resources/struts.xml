@@ -45,6 +45,14 @@
 			<result name="error">/view/test/error.jsp</result>
 		</action>
 	</package>
+	
+	<package name="main" namespace="/main" extends="struts-default">
+		<action name="main_*" class="org.moon.action.sys.MainAction"
+			method="{1}">
+			<result name="success">/test/jqueryDemo.jsp</result>
+			<result name="error">/view/test/error.jsp</result>
+		</action>
+	</package>
 
   <include file="struts_config/employee_admin.xml"></include>
   <include file="struts_config/advertise_admin.xml"></include> 
