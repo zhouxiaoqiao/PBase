@@ -24,5 +24,5 @@
 			alert("url路径为空!");
 	}
 </script>
-<iframe src="${pageContext.request.contextPath}/advertise_admin/collect_inf/display_interveiw.jsp?action=/adminAdvetise/resumeAdmin_" id="main_Frame" name="main_Frame" height="500"
+<iframe src="${pageContext.request.contextPath}/advertise_admin/collect_inf/display_interveiw.jsp?action=/adminAdvetise/resumeAdmin_" id="main_Frame" name="main_Frame" height="100%"
 	width="100%"></iframe>
