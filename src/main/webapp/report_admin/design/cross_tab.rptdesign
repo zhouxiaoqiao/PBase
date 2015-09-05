@@ -44,7 +44,7 @@
                     <text-property name="displayName">staff_name</text-property>
                     <text-property name="heading">staff_name</text-property>
                 </structure>
-                <structure>
+                <structure> 
                     <property name="columnName">job_name</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">job_name</text-property>
