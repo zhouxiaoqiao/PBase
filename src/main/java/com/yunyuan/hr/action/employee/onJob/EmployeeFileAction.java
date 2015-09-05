@@ -42,13 +42,7 @@ public class EmployeeFileAction extends BaseAction
 
 	private GeneralService ds = new GeneralService();
 
-	private int currPage;
 
-	private int pageSize;
-
-	private String sortname;
-
-	private String sortorder;
 
 	private String eid;
 
@@ -63,6 +57,7 @@ public class EmployeeFileAction extends BaseAction
 	private String graduate_time;
 
 	private String join_time;
+	private String born_date;
 
 	private Integer dept_id;
 
@@ -98,7 +93,7 @@ public class EmployeeFileAction extends BaseAction
 			setPageParm(request);
 
 			long id = KeyUtil.getLongID();
-			String sql = "INSERT  INTO tab_employee (eid,staff_name,user_account,job_name,age,status,join_time,college,graduate_time,dept_id,salary_month) VALUES ('"
+			String sql = "INSERT  INTO tab_employee (eid,staff_name,user_account,job_name,work_history,address,work_year,professional,age,status,join_time,college,graduate_time,dept_id,born_date,salary_month) VALUES ('"
 					+ id
 					+ "','"
 					+ staff_name
@@ -106,6 +101,14 @@ public class EmployeeFileAction extends BaseAction
 					+ user_account
 					+ "','"
 					+ job_name
+					+ "','"
+					+ work_history
+					+ "','"
+					+ address
+					+ "','"
+					+ work_year
+					+ "','"
+					+ professional
 					+ "','"
 					+ age
 					+ "','"
@@ -116,14 +119,20 @@ public class EmployeeFileAction extends BaseAction
 					+ college
 					+ "','"
 					+ graduate_time
-					+ "'," + dept_id + "," + salary_month + ")";
+					+ "',"
+					+ dept_id
+					+ ",'"
+					+ born_date
+					+ "','"
+					+ salary_month + ")";
 
 			if (ds.insert(sql, null) > 0)
 			{
 				logger.info("插入成功！");
 			}
 
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			return "error";
@@ -147,34 +156,30 @@ public class EmployeeFileAction extends BaseAction
 		{
 			setPageParm(request);
 			String u_sql = null;
-			u_sql = SQLTool.appendUpdateSql(u_sql, "staff_name", "String",
-					staff_name);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "user_account", "String",
-					user_account);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "job_name", "String",
-					job_name);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "age", "String",
-					age);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "status", "String",
-					status);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "graduate_time", "date",
-					graduate_time);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "college", "String",
-					college);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "dept_id", "String",
-					""+dept_id);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "salary_month", "String",
-					""+salary_month);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "join_time", "date",
-					join_time);
-			String sql = "update tab_employee set "+u_sql+" where eid=" + eid;
+			u_sql = SQLTool.appendUpdateSql(u_sql, "staff_name", "String", staff_name);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "user_account", "String", user_account);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "job_name", "String", job_name);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "age", "String", age);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "status", "String", status);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "graduate_time", "date", graduate_time);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "college", "String", college);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "dept_id", "String", "" + dept_id);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "salary_month", "String", "" + salary_month);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "join_time", "date", join_time);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "born_date", "date", born_date);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "work_year", "String", work_year);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "address", "String", address);
+			u_sql = SQLTool.appendUpdateSql(u_sql, "work_history", "String", work_history);
+
+			String sql = "update tab_employee set " + u_sql + " where eid=" + eid;
 			if (ds.update(sql, null) > 0)
 			{
 				logger.info("更新成功！");
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
-			
+
 			e.printStackTrace();
 			return "error";
 		}
@@ -203,8 +208,7 @@ public class EmployeeFileAction extends BaseAction
 			if (did != null)
 			{
 				did = did.replaceAll(",", "','");
-				String sql = "DELETE FROM  tab_employee where eid in ('" + did
-						+ "')";
+				String sql = "DELETE FROM  tab_employee where eid in ('" + did + "')";
 				int rs = ds.delete(sql, null);
 				if (rs > 0)
 				{
@@ -212,15 +216,17 @@ public class EmployeeFileAction extends BaseAction
 				}
 
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			//return "error";
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, msg);
 		}
-		
+
 		//return "success";
 	}
 
@@ -235,18 +241,20 @@ public class EmployeeFileAction extends BaseAction
 		try
 		{
 			logger.info("keyID==" + keyID);
-			String sql = "SELECT u.*,s.name as  dept_name from tab_employee u,sec_org s where  u.eid="
-					+ keyID + "  and u.dept_id=s.id   ";
+			String sql = "SELECT u.*,s.name as  dept_name from tab_employee u,sec_org s where  u.eid=" + keyID
+					+ "  and u.dept_id=s.id   ";
 			List<JSONObject> jl = ds.query(sql, null);
 			// JSONObject data_ret = new JSONObject();
 			jsonObj = jl.get(0);
 
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			jsonObj.put("error", "查询失败！");
 			logger.error(e);
 			//return "error";
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, jsonObj);
 		}
@@ -282,18 +290,19 @@ public class EmployeeFileAction extends BaseAction
 						+ dept_id + ")))  and e.dept_id=s.id   ";
 			if (sortname != null && !"".equals(sortname))
 			{
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname,
-						sortorder);
-			} else
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid",
-						"desc");
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
+			}
+			else
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid", "desc");
 			jsonObj.put("success", "查询成功！");
 
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			jsonObj.put("error", "查询失败！");
 			logger.error(e);
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, jsonObj);
 		}
@@ -329,7 +338,6 @@ public class EmployeeFileAction extends BaseAction
 		return "success";
 	}
 
-	
 	/**
 	 * @param response
 	 * @param JSONObj
@@ -359,7 +367,8 @@ public class EmployeeFileAction extends BaseAction
 			}
 
 			response.getWriter().print(JSONObj);
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 
 			logger.error("写JSON返回数据出错.");
@@ -375,10 +384,8 @@ public class EmployeeFileAction extends BaseAction
 	private void setPageParm(HttpServletRequest request)
 	{
 
-		currPage = request.getParameter("page") != null ? Integer
-				.parseInt(request.getParameter("page")) : 1;
-		pageSize = request.getParameter("rows") != null ? Integer
-				.parseInt(request.getParameter("rows")) : 1;
+		currPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+		pageSize = request.getParameter("rows") != null ? Integer.parseInt(request.getParameter("rows")) : 1;
 		sortname = request.getParameter("sidx");
 		sortorder = request.getParameter("sord");
 		request.setAttribute("page", currPage);
@@ -545,6 +552,16 @@ public class EmployeeFileAction extends BaseAction
 	public void setAddress(String address)
 	{
 		this.address = address;
+	}
+
+	public String getBorn_date()
+	{
+		return born_date;
+	}
+
+	public void setBorn_date(String born_date)
+	{
+		this.born_date = born_date;
 	}
 
 }
