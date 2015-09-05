@@ -154,7 +154,7 @@
 		document.getElementById("dept_name").value = data_ret.dept_name;
 		document.getElementById("dept_id").value = data_ret.dept_id;
 		document.getElementById("salary_month").value = data_ret.salary_month;
-
+		document.getElementById("graduate_time").value = data_ret.graduate_time;
 		document.getElementById("status").value = data_ret.status;
 		document.getElementById("work_history").value = data_ret.work_history;
 		document.getElementById("born_date").value = data_ret.born_date;
@@ -162,6 +162,9 @@
 		document.getElementById("work_year").value = data_ret.work_year;
 		document.getElementById("job_name").value = data_ret.job_name;
 		document.getElementById("address").value = data_ret.address;
+		document.getElementById("join_time").value = data_ret.join_time;
+		
+		
 
 	}
 
