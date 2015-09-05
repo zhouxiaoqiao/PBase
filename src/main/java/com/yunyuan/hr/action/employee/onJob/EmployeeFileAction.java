@@ -170,7 +170,7 @@ public class EmployeeFileAction extends BaseAction
 			u_sql = SQLTool.appendUpdateSql(u_sql, "work_year", "String", work_year);
 			u_sql = SQLTool.appendUpdateSql(u_sql, "address", "String", address);
 			u_sql = SQLTool.appendUpdateSql(u_sql, "work_history", "String", work_history);
-
+			u_sql = SQLTool.appendUpdateSql(u_sql, "professional", "String", professional);
 			String sql = "update tab_employee set " + u_sql + " where eid=" + eid;
 			if (ds.update(sql, null) > 0)
 			{
