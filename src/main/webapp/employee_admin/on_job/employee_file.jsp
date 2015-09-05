@@ -13,12 +13,13 @@
 <link rel="stylesheet" type="text/css" href="css/common.css">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>员工档案</title>
-<frameset cols="200,*">
+<frameset cols="200,*" style="height:100%;">
 	<frame id="display_dept" name="display_dept"
 		src="<%=basePath%>employee_admin/on_job/display_dept.jsp">
 	<frame id="display_employee" name="display_employee"
 		src="<%=basePath%>employee_admin/on_job/display_employee.jsp?action=/adminEmployee/employeeFile_">
 </frameset>
+
 <body>
 </body>
 
