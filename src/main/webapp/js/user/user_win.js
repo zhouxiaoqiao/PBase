@@ -416,9 +416,9 @@ function save(form_id) {
 		if (form.elements[i].type != "hidden") {
 			if (form.elements[i].value == "") {
 				if (alert_inf != '')
-					alert_inf = alert_inf + ',第' + row + "行值为空!";
+					alert_inf = alert_inf + ',' +form.elements[i].name  + "值为空!";
 				else
-					alert_inf = "第" + row + "行值为空!";
+					alert_inf = form.elements[i].name + "值为空!";
 			}
 			row++;
 		}

@@ -124,7 +124,7 @@ public class EmployeeFileAction extends BaseAction
 					+ ",'"
 					+ born_date
 					+ "','"
-					+ salary_month + ")";
+					+ salary_month + "')";
 
 			if (ds.insert(sql, null) > 0)
 			{

@@ -1,7 +1,5 @@
 package org.moon.action.util;
 
- 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -15,20 +13,24 @@ import org.apache.struts2.ServletActionContext;
 
 import com.alibaba.fastjson.JSON;
 
-
-
-public class BaseAction  
-{ 
+public class BaseAction
+{
 
 	public JSONObject result;// 返回的json
 
 	public String pageNumber;// 每页显示的记录数
 
-	public String pageSize;// 当前第几页
+	public int pageSize;// 每页显示的记录数
 
 	public int pageSize_num = 0;
 
 	public int pageNumber_num = 0;
+
+	public int currPage;
+
+	public String sortname;
+
+	public String sortorder;
 
 	/**
 	 * @param json
@@ -69,6 +71,7 @@ public class BaseAction
 		writer.flush();
 		writer.close();
 	}
+
 	/**
 	 * @return
 	 * @author 周小桥 |2015-6-25 上午10:02:35
@@ -79,17 +82,18 @@ public class BaseAction
 		JSONObject ret = new JSONObject();
 		int start = 0;
 		int end = 0;
-		if (pageSize != null && pageNumber != null)
-		{
-			pageSize_num = Integer.parseInt(pageSize);
-			pageNumber_num = Integer.parseInt(pageNumber);
-		}
+//		if (pageSize != null && pageNumber != null)
+//		{
+//			pageSize_num = Integer.parseInt(pageSize);
+//			pageNumber_num = Integer.parseInt(pageNumber);
+//		}
 
 		if (pageNumber_num > 1)
 		{
 			start = (pageNumber_num - 1) * pageSize_num;
 			end = (pageNumber_num) * pageSize_num;
-		} else
+		}
+		else
 		{
 			start = 0;
 			end = pageSize_num;
@@ -115,14 +119,15 @@ public class BaseAction
 		data_json.put("pageNumber", this.pageNumber);
 		return data_json;
 	}
-/**
- * 
- * @param rows_json
- * @param total
- * @return
- * @author 周小桥 |2015-7-6 下午2:33:56
- * @version 0.1
- */
+
+	/**
+	 * 
+	 * @param rows_json
+	 * @param total
+	 * @return
+	 * @author 周小桥 |2015-7-6 下午2:33:56
+	 * @version 0.1
+	 */
 	public JSONObject setPageParam(JSONArray rows_json, int total)
 	{
 		JSONObject data_json = new JSONObject();
@@ -132,6 +137,7 @@ public class BaseAction
 		data_json.put("pageNumber", this.pageNumber);
 		return data_json;
 	}
+
 	public JSONObject getResult()
 	{
 		return result;
@@ -152,14 +158,66 @@ public class BaseAction
 		this.pageNumber = pageNumber;
 	}
 
-	public String getPageSize()
+ 
+
+	public int getPageSize()
 	{
 		return pageSize;
 	}
 
-	public void setPageSize(String pageSize)
+	public void setPageSize(int pageSize)
 	{
 		this.pageSize = pageSize;
+	}
+
+	public int getPageSize_num()
+	{
+		return pageSize_num;
+	}
+
+	public void setPageSize_num(int pageSize_num)
+	{
+		this.pageSize_num = pageSize_num;
+	}
+
+	public int getPageNumber_num()
+	{
+		return pageNumber_num;
+	}
+
+	public void setPageNumber_num(int pageNumber_num)
+	{
+		this.pageNumber_num = pageNumber_num;
+	}
+
+	public int getCurrPage()
+	{
+		return currPage;
+	}
+
+	public void setCurrPage(int currPage)
+	{
+		this.currPage = currPage;
+	}
+
+	public String getSortname()
+	{
+		return sortname;
+	}
+
+	public void setSortname(String sortname)
+	{
+		this.sortname = sortname;
+	}
+
+	public String getSortorder()
+	{
+		return sortorder;
+	}
+
+	public void setSortorder(String sortorder)
+	{
+		this.sortorder = sortorder;
 	}
 
 }
