@@ -316,6 +316,14 @@ if(whereSQL!="null"&amp;&amp;whereSQL!="no"){
         </label>
         <table id="46">
             <property name="style">tables</property>
+            <property name="borderBottomColor">#000000</property>
+            <property name="borderBottomWidth">medium</property>
+            <property name="borderLeftColor">#000000</property>
+            <property name="borderLeftWidth">medium</property>
+            <property name="borderRightColor">#000000</property>
+            <property name="borderRightWidth">medium</property>
+            <property name="borderTopColor">#000000</property>
+            <property name="borderTopWidth">medium</property>
             <property name="pageBreakAfter">auto</property>
             <property name="pageBreakBefore">auto</property>
             <property name="dataSet">empds</property>
@@ -351,7 +359,7 @@ if(whereSQL!="null"&amp;&amp;whereSQL!="no"){
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <property name="pageBreakInterval">10</property>
+            <property name="pageBreakInterval">30</property>
             <column id="75"/>
             <column id="76"/>
             <column id="77"/>
@@ -360,6 +368,9 @@ if(whereSQL!="null"&amp;&amp;whereSQL!="no"){
             <header>
                 <row id="47">
                     <property name="style">table-th</property>
+                    <property name="borderBottomColor">#000000</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <list-property name="visibility"/>
                     <cell id="48">
                         <label id="49">
                             <text-property name="text">员工姓名</text-property>
@@ -390,6 +401,14 @@ if(whereSQL!="null"&amp;&amp;whereSQL!="no"){
             <detail>
                 <row id="58">
                     <property name="style">table-rows</property>
+                    <property name="borderBottomColor">#000000</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <property name="borderLeftColor">#000000</property>
+                    <property name="borderLeftStyle">solid</property>
+                    <property name="borderLeftWidth">thin</property>
+                    <property name="borderRightColor">#000000</property>
+                    <property name="borderRightStyle">solid</property>
+                    <property name="borderRightWidth">thin</property>
                     <cell id="59">
                         <data id="60">
                             <property name="resultSetColumn">staff_name</property>
@@ -420,6 +439,18 @@ if(whereSQL!="null"&amp;&amp;whereSQL!="no"){
             <footer>
                 <row id="69">
                     <property name="style">table-last-row</property>
+                    <property name="borderBottomColor">#000000</property>
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">medium</property>
+                    <property name="borderLeftColor">#000000</property>
+                    <property name="borderLeftStyle">solid</property>
+                    <property name="borderLeftWidth">medium</property>
+                    <property name="borderRightColor">#000000</property>
+                    <property name="borderRightStyle">solid</property>
+                    <property name="borderRightWidth">medium</property>
+                    <property name="borderTopColor">#000000</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">medium</property>
                     <cell id="70"/>
                     <cell id="71"/>
                     <cell id="72"/>

@@ -2116,7 +2116,7 @@ var excute_sql = params["excute_sql"].value;
             <property name="outputFormat">SVG</property>
             <property name="inheritColumns">false</property>
             <property name="dataSet">ed_ds</property>
-            <property name="height">130pt</property>
+            <property name="height">4.03125in</property>
             <property name="width">7.947916666666667in</property>
             <list-property name="boundDataColumns">
                 <structure>
