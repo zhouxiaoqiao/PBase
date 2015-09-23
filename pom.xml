@@ -177,24 +177,11 @@
 			<version>${struts2.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>jstl</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>2.1</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- 公共包或其他包 -->
 		<dependency>
 			<groupId>net.sf.json-lib</groupId>
@@ -349,7 +336,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>maven-webapp</finalName>
+		<finalName>PBase</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
@@ -370,6 +357,7 @@
 				</includes>
 				<filtering>true</filtering>
 			</resource>
+		
 		</resources>
 		<pluginManagement>
 			<plugins>
@@ -386,7 +374,7 @@
 					<artifactId>maven-war-plugin</artifactId>
 					<version>2.4</version>
 					<configuration>
-						<warSourceDirectory>WebRoot</warSourceDirectory>
+						<warSourceDirectory>src/main/webapp</warSourceDirectory>
 						<failOnMissingWebXml>false</failOnMissingWebXml>
 					</configuration>
 				</plugin>
