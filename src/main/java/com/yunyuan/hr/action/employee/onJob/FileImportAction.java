@@ -4,7 +4,12 @@
  */
 package com.yunyuan.hr.action.employee.onJob;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,10 +18,12 @@ import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
-import org.moon.action.util.BaseAction;
 import org.moon.common.util.ChinaTransCode;
+import org.moon.service.ExcelImportService;
 import org.moon.service.GeneralService;
- 
+
+import com.opensymphony.xwork2.ActionSupport;
+import com.yunyuan.util.FileAdmin;
 
 /**
  * <b>版权信息 :</b> 2012，云技术有限公司<br/>
@@ -24,8 +31,13 @@ import org.moon.service.GeneralService;
  * <b>版本历史 :</b> <br/>
  * @author 周小桥| 2014-6-18 下午7:07:56 | 创建
  */
-public class FileImportAction extends BaseAction
+public class FileImportAction extends ActionSupport
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -949122781455369656L;
 
 	/**
 	 * Method execute
@@ -38,6 +50,8 @@ public class FileImportAction extends BaseAction
 	private Logger logger = Logger.getLogger(this.getClass());
 
 	private GeneralService ds = new GeneralService();
+
+	ExcelImportService eis = new ExcelImportService();
 
 	private int currPage;
 
@@ -67,6 +81,34 @@ public class FileImportAction extends BaseAction
 
 	private Integer salary_month;
 
+	protected File upload_file;
+
+	private String import_path;
+
+	private String fileName;
+
+	/**
+	 * 
+	 * @return
+	 * @author 周小桥 |2015-9-24 下午3:25:14
+	 * @version 0.1
+	 */
+	public InputStream getDownloadFile() throws FileNotFoundException, UnsupportedEncodingException
+	{
+		logger.info("getDownloadFile");
+		//HttpServletRequest request = ServletActionContext.getRequest();
+		//String path = request.getPathInfo()getRealPath("/upload");
+		InputStream inputStream = new FileInputStream("E:/logs/test.xls");
+
+		return   inputStream;//ServletActionContext.getServletContext().getResourceAsStream("E:/logs/test/xls");
+	}
+
+	// 下载
+	public String downloadFile() throws Exception
+	{
+		return "success";
+	}
+
 	/**
 	 * @param mapping
 	 * @param form
@@ -75,14 +117,17 @@ public class FileImportAction extends BaseAction
 	 * @return
 	 * @throws Throwable
 	 */
-	public String add() throws Throwable
+	public String importExcel() throws Throwable
 	{
-		logger.info("add");
+		logger.info("importExcel");
 		HttpServletRequest request = ServletActionContext.getRequest();
-		// HttpServletResponse response = ServletActionContext.getResponse();
+		//String import_path=request.getParameter("import_path");
+		//HttpServletResponse response = ServletActionContext.getResponse();
 		try
 		{
-			setPageParm(request);
+
+			FileAdmin.uploadFile(request, upload_file, fileName);
+			//setPageParm(request);
 			String eid = "" + System.currentTimeMillis();
 			String sql = "INSERT  INTO tab_employee (eid,name,job,age,status,join_time,college,graduate_time,dept_id,salary_month) VALUES ('"
 					+ eid
@@ -97,16 +142,15 @@ public class FileImportAction extends BaseAction
 					+ "','"
 					+ join_time
 					+ "','"
-					+ college
-					+ "','"
-					+ graduate_time + "'," + dept_id + "," + salary_month + ")";
+					+ college + "','" + graduate_time + "'," + dept_id + "," + salary_month + ")";
 
-			if (ds.insert(sql, null) > 0)
-			{
-				logger.info("插入成功！");
-			}
+			//			if (ds.insert(sql, null) > 0)
+			//			{
+			//				logger.info("插入成功！");
+			//			}
 
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -129,17 +173,15 @@ public class FileImportAction extends BaseAction
 		{
 			setPageParm(request);
 
-			String sql = "update tab_employee set name='" + name + "',job='"
-					+ job + "',age='" + age + "',status='" + status
-					+ "',graduate_time='" + graduate_time + "',college='"
-					+ college + "',dept_id=" + dept_id + ",salary_month="
-					+ salary_month + ",join_time='" + join_time
-					+ "' where eid=" + eid;
+			String sql = "update tab_employee set name='" + name + "',job='" + job + "',age='" + age + "',status='"
+					+ status + "',graduate_time='" + graduate_time + "',college='" + college + "',dept_id=" + dept_id
+					+ ",salary_month=" + salary_month + ",join_time='" + join_time + "' where eid=" + eid;
 			if (ds.update(sql, null) > 0)
 			{
 				logger.info("更新成功！");
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -168,8 +210,7 @@ public class FileImportAction extends BaseAction
 			if (did != null)
 			{
 				did = did.replaceAll(",", "','");
-				String sql = "DELETE FROM  tab_employee where eid in ('" + did
-						+ "')";
+				String sql = "DELETE FROM  tab_employee where eid in ('" + did + "')";
 				int rs = ds.delete(sql, null);
 				if (rs > 0)
 				{
@@ -177,10 +218,12 @@ public class FileImportAction extends BaseAction
 				}
 
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, msg);
 		}
@@ -210,17 +253,18 @@ public class FileImportAction extends BaseAction
 				sql = "SELECT t.*,d.name as  dept_name from tab_employee t,tab_dept d where t.dept_id=d.dept_id ";
 			if (sortname != null && !"".equals(sortname))
 			{
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname,
-						sortorder);
-			} else
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid",
-						"desc");
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
+			}
+			else
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid", "desc");
 			jsonObj.put("success", "查询成功！");
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			jsonObj.put("error", "查询失败！");
 			logger.error(e);
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, jsonObj);
 		}
@@ -285,7 +329,8 @@ public class FileImportAction extends BaseAction
 			}
 
 			response.getWriter().print(JSONObj);
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 
 			logger.error("写JSON返回数据出错.");
@@ -301,10 +346,8 @@ public class FileImportAction extends BaseAction
 	private void setPageParm(HttpServletRequest request)
 	{
 
-		currPage = request.getParameter("page") != null ? Integer
-				.parseInt(request.getParameter("page")) : 1;
-		pageSize = request.getParameter("rows") != null ? Integer
-				.parseInt(request.getParameter("rows")) : 1;
+		currPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+		pageSize = request.getParameter("rows") != null ? Integer.parseInt(request.getParameter("rows")) : 1;
 		sortname = request.getParameter("sidx");
 		sortorder = request.getParameter("sord");
 		request.setAttribute("page", currPage);
@@ -421,6 +464,36 @@ public class FileImportAction extends BaseAction
 	public void setSalary_month(Integer salary_month)
 	{
 		this.salary_month = salary_month;
+	}
+
+	public File getUpload_file()
+	{
+		return upload_file;
+	}
+
+	public void setUpload_file(File upload_file)
+	{
+		this.upload_file = upload_file;
+	}
+
+	public String getImport_path()
+	{
+		return import_path;
+	}
+
+	public void setImport_path(String import_path)
+	{
+		this.import_path = import_path;
+	}
+
+	public String getFileName()
+	{
+		return fileName;
+	}
+
+	public void setFileName(String fileName)
+	{
+		this.fileName = fileName;
 	}
 
 }
