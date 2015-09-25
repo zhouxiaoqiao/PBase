@@ -70,7 +70,7 @@ default-character-set=utf8
               去掉WEB-INF/lib下的   jsp-api.jar  即可.
   3.6   部署到tomcat时 java.lang.ClassNotFoundException: org.springframework.web.context.ContextLoa 类似错
                解决办法 选中工程右键 properties-->development  assmbly-->add(选择Entries) 增加 maven依赖
-  
+  3.7  maven missing tools,在maven本地库直接加tools.jar,注意修改文件名,改成需要的tools.jar版本
 六.自动初始化数据库
     注意:sec_menu表的最高父菜单需要将id=1690改成0
   
