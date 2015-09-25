@@ -23,7 +23,7 @@
 		</action>
 		<action name="fileImport_*"
 			class="com.yunyuan.hr.action.employee.onJob.FileImportAction" method="{1}">
-			<result name="success">/employee_admin/on_job/file_import.jsp</result>
+			<result name="success">/employee_admin/on_job/file_import.jsp?action=/adminEmployee/fileImport_</result>
 			<result name="fail">/common/500.jsp</result>
 		</action>
 		<action name="regularApply_*"
