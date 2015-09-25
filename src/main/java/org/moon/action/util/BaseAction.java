@@ -13,7 +13,8 @@ import org.apache.struts2.ServletActionContext;
 
 import com.alibaba.fastjson.JSON;
 
-public class BaseAction
+
+public class BaseAction  
 {
 
 	public JSONObject result;// 返回的json
