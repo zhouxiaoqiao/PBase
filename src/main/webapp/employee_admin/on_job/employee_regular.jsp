@@ -70,23 +70,38 @@ PageUtil pu=new PageUtil(request,action);
 					rowNum : 15,
 					rowList : [ 10, 15, 20 ], //可调整每页显示的记录数 
 					multiselect : true,
-					onSelectRow : function(rowid) {
-						
-						document.getElementById("editUnitDiv").style.visibility = "visible";
-						  var rowData = $("#dataTableId").getRowData(rowid);
-							$('#staff_name').attr('value', rowData.staff_name);
-							$('#eid').attr('value', rowData.rowid);
-
-					},
-					caption : "员工信息表"
+					caption : "员工转正表"
 				});
 		jQuery("#dataTableId").jqGrid('navGrid', '#pagerId', {
 			add : false,
 			del : false,
 			search : false,
-			edit : false
-		});
+			edit : false,
+			refresh : false
+		}), initUserOperate();
 	});
+  	
+  	function initUserOperate() {
+		 
+		jQuery("#dataTableId").navButtonAdd('#pagerId', {
+			caption : "转正操作",
+			onClickButton : function() {
+				var gr = $("#dataTableId").jqGrid('getGridParam', 'selrow');
+				var mulsel = $("#dataTableId").getGridParam('selarrrow');
+				if (gr != null && mulsel.length < 2) {
+					var rowData = $("#dataTableId").getRowData(gr);			
+					document.getElementById("editUnitDiv").style.visibility = "visible";
+					$('#staff_name').attr('value', rowData.staff_name);
+				    $('#eid').attr('value', rowData.rowid);
+				} else if (mulsel.length > 1) {
+					alert("你不能选择多于一行 ！");
+				} else
+					alert("你没有选择某行 ！");
+			}
+		}).trigger("reloadGrid"); // 重新载入;
+		 
+
+	}
 </script>
 </head>
 <body>

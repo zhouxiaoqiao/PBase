@@ -72,10 +72,7 @@ PageUtil pu=new PageUtil(request,action);
 					multiselect : true,
 					onSelectRow : function(rowid) {
 						
-						document.getElementById("editUnitDiv").style.visibility = "visible";
-						  var rowData = $("#dataTableId").getRowData(rowid);
-							$('#staff_name').attr('value', rowData.staff_name);
-							$('#eid').attr('value', rowData.rowid);
+					
 
 					},
 					caption : "员工信息表"
@@ -84,9 +81,32 @@ PageUtil pu=new PageUtil(request,action);
 			add : false,
 			del : false,
 			search : false,
-			edit : false
-		});
+			edit : false,
+			refresh : false
+		}), initUserOperate();
 	});
+	  	
+	  	function initUserOperate() {
+			 
+			jQuery("#dataTableId").navButtonAdd('#pagerId', {
+				caption : "转正审核",
+				onClickButton : function() {
+					var gr = $("#dataTableId").jqGrid('getGridParam', 'selrow');
+					var mulsel = $("#dataTableId").getGridParam('selarrrow');
+					if (gr != null && mulsel.length < 2) {
+						var rowData = $("#dataTableId").getRowData(gr);			
+						    document.getElementById("editUnitDiv").style.visibility = "visible";
+							$('#staff_name').attr('value', rowData.staff_name);
+							$('#eid').attr('value', rowData.rowid);
+					} else if (mulsel.length > 1) {
+						alert("你不能选择多于一行 ！");
+					} else
+						alert("你没有选择某行 ！");
+				}
+			}).trigger("reloadGrid"); // 重新载入;
+			 
+
+		}
 </script>
 </head>
 <body>
@@ -103,7 +123,7 @@ PageUtil pu=new PageUtil(request,action);
 				class="table_all_border" cellspacing="0" style="margin-bottom: 0px;border-bottom: 0px">
 			<tr>
 				<td class="td_table_top" align="center">
-					转正管理
+					审核管理
 				</td>
 			</tr>
 		</table>
@@ -114,24 +134,24 @@ PageUtil pu=new PageUtil(request,action);
 					<td class="td_table_2"><input type='text' name='staff_name'
 						id='staff_name' disabled /> <input type="hidden" id="eid" name='eid'
 						value="" /></td>
-					<td class="td_table_1">职员转正</td>
+					<td class="td_table_1">转正审核</td>
 					<td class="td_table_2"><select name="status"
 							id="status">
 								<option value="1">同意转正</option>
 								<option value="2">不同意转正</option>
 								<option value="3">延长试用期</option>
 						</select></td>
-					<td class="td_table_1">转正日期</td>
+					<td class="td_table_1">审核日期</td>
 					<td class="td_table_2"><input type='text' name='regular_date'
 						id='regular_date' onFocus="WdatePicker()"/></td>
-					<td class="td_table_1">转正说明</td>
+					<td class="td_table_1">审核意见</td>
 					<td class="td_table_2"><textarea
 							name="regular_inf" id="regular_inf" cols="50"></textarea></td>
 				</tr>
 				<tr>
 					<td colspan="8" class="td_table_2"><div align="center">
 							<input name="button" type='button' class="button_70px"
-								onclick='save("editForm")' value='转 正'> <input
+								onclick='save("editForm")' value='已审核'> <input
 								name="button" type='button' class="button_70px"
 								onClick="clearWin();" value='清 除'> 
 						</div></td>
