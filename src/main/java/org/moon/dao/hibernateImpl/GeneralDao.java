@@ -18,6 +18,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.stereotype.Repository;
@@ -34,7 +35,7 @@ public class GeneralDao implements IGeneralDao {
 	
 	private static Log log = LogFactory.getLog(GeneralDao.class);
 	
-	@Resource
+	@Autowired
 	private HibernateTemplate hibernateTemplate;
 
 	public void create(Object entity) throws Exception {

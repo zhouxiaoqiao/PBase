@@ -1,6 +1,6 @@
 package org.snaker.framework.security.dao;
 
-import org.snaker.framework.orm.hibernate.HibernateDao;
+import org.moon.common.db.hibernate.ParentHBDao;
 import org.snaker.framework.security.entity.Org;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
  * @since 0.1
  */
 @Component
-public class OrgDao extends HibernateDao<Org, Long> {
+public class OrgDao extends ParentHBDao<Org, Long> {
 
 }

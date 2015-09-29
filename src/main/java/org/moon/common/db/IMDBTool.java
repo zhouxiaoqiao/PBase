@@ -1,6 +1,7 @@
 package org.moon.common.db;
 
 import java.io.FileInputStream;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import net.sf.json.JSONObject;
  * <b>版本历史 :</b> <br/>
  * @author 周小桥| 2014-6-18 下午5:45:15 | 创建
  */
-public interface IMDBTool
+public interface IMDBTool 
 {
 	public ResultSet executeQuery(String sql, List<?> parm) throws Exception;
 

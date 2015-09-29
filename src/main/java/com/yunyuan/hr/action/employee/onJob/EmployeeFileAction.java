@@ -6,19 +6,17 @@ package com.yunyuan.hr.action.employee.onJob;
 
 import java.io.IOException;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.sf.json.JSONObject;
-
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import org.moon.action.util.BaseAction;
-import org.moon.common.db.SQLTool;
 import org.moon.common.util.ChinaTransCode;
 import org.moon.service.GeneralService;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import com.yunyuan.hr.entity.Employee;
+import com.yunyuan.hr.service.EmployeeService;
 import com.yunyuan.util.KeyUtil;
 
 /**
@@ -41,8 +39,8 @@ public class EmployeeFileAction extends BaseAction
 	private Logger logger = Logger.getLogger(this.getClass());
 
 	private GeneralService ds = new GeneralService();
-
-
+	@Autowired
+	EmployeeService employeeService;
 
 	private String eid;
 
@@ -86,54 +84,76 @@ public class EmployeeFileAction extends BaseAction
 	public String add() throws Throwable
 	{
 		logger.info("add");
-		HttpServletRequest request = ServletActionContext.getRequest();
+		//HttpServletRequest request = ServletActionContext.getRequest();
 		// HttpServletResponse response = ServletActionContext.getResponse();
 		try
 		{
-			setPageParm(request);
+			//setPageParm(request);
 
 			long id = KeyUtil.getLongID();
-			String sql = "INSERT  INTO tab_employee (eid,staff_name,user_account,job_name,work_history,address,work_year,professional,age,status,join_time,college,graduate_time,dept_id,born_date,salary_month) VALUES ('"
-					+ id
-					+ "','"
-					+ staff_name
-					+ "','"
-					+ user_account
-					+ "','"
-					+ job_name
-					+ "','"
-					+ work_history
-					+ "','"
-					+ address
-					+ "','"
-					+ work_year
-					+ "','"
-					+ professional
-					+ "','"
-					+ age
-					+ "','"
-					+ status
-					+ "','"
-					+ join_time
-					+ "','"
-					+ college
-					+ "','"
-					+ graduate_time
-					+ "',"
-					+ dept_id
-					+ ",'"
-					+ born_date
-					+ "','"
-					+ salary_month + "')";
+			Employee employee = new Employee();
+			employee.setEid("" + id);
+			employee.setStaff_name("" + staff_name);
+			employee.setUser_account("" + user_account);
+			employee.setJob_name("" + job_name);
+			employee.setWork_history("" + work_history);
+			employee.setAddress("" + address);
+			employee.setWork_year("" + work_year);
+			employee.setProfessional("" + professional);
+			employee.setAge("" + age);
+			employee.setStatus("" + status);
+			java.sql.Date sql_date = java.sql.Date.valueOf(join_time);
+			employee.setJoin_time(sql_date);
+			employee.setCollege("" + college);
+			employee.setGraduate_time("" + graduate_time);
+			employee.setDept_id(dept_id);
+			employee.setGraduate_time("" + born_date);
+			employee.setSalary_month("" + salary_month);
+			employeeService.saveEmployee(employee);
+			//logger.info();
 
-			if (ds.insert(sql, null) > 0)
-			{
-				logger.info("插入成功！");
-			}
+			//			String sql = "INSERT  INTO tab_employee (eid,staff_name,user_account,job_name,work_history,address,work_year,professional,age,status,join_time,college,graduate_time,dept_id,born_date,salary_month) VALUES ('"
+			//					+ id
+			//					+ "','"
+			//					+ staff_name
+			//					+ "','"
+			//					+ user_account
+			//					+ "','"
+			//					+ job_name
+			//					+ "','"
+			//					+ work_history
+			//					+ "','"
+			//					+ address
+			//					+ "','"
+			//					+ work_year
+			//					+ "','"
+			//					+ professional
+			//					+ "','"
+			//					+ age
+			//					+ "','"
+			//					+ status
+			//					+ "','"
+			//					+ join_time
+			//					+ "','"
+			//					+ college
+			//					+ "','"
+			//					+ graduate_time
+			//					+ "',"
+			//					+ dept_id
+			//					+ ",'"
+			//					+ born_date
+			//					+ "','"
+			//					+ salary_month + "')";
+			//
+			//			if (ds.insert(sql, null) > 0)
+			//			{
+			//				logger.info("插入成功！");
+			//			}
 
 		}
 		catch (Exception e)
 		{
+			logger.equals(e.getMessage());
 			e.printStackTrace();
 			return "error";
 		}
@@ -151,31 +171,51 @@ public class EmployeeFileAction extends BaseAction
 	public String update()
 	{
 		logger.info("update");
-		HttpServletRequest request = ServletActionContext.getRequest();
+	//	HttpServletRequest request = ServletActionContext.getRequest();
 		try
 		{
-			setPageParm(request);
-			String u_sql = null;
-			u_sql = SQLTool.appendUpdateSql(u_sql, "staff_name", "String", staff_name);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "user_account", "String", user_account);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "job_name", "String", job_name);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "age", "String", age);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "status", "String", status);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "graduate_time", "date", graduate_time);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "college", "String", college);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "dept_id", "String", "" + dept_id);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "salary_month", "String", "" + salary_month);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "join_time", "date", join_time);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "born_date", "date", born_date);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "work_year", "String", work_year);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "address", "String", address);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "work_history", "String", work_history);
-			u_sql = SQLTool.appendUpdateSql(u_sql, "professional", "String", professional);
-			String sql = "update tab_employee set " + u_sql + " where eid=" + eid;
-			if (ds.update(sql, null) > 0)
-			{
-				logger.info("更新成功！");
-			}
+			
+			Employee employee = new Employee();
+			employee.setEid("" + eid);
+			employee.setStaff_name("" + staff_name);
+			employee.setUser_account("" + user_account);
+			employee.setJob_name("" + job_name);
+			employee.setWork_history("" + work_history);
+			employee.setAddress("" + address);
+			employee.setWork_year("" + work_year);
+			employee.setProfessional("" + professional);
+			employee.setAge("" + age);
+			employee.setStatus("" + status);
+			//logger.info("join_time=="+join_time);
+			java.sql.Date sql_date = java.sql.Date.valueOf(join_time);
+			employee.setJoin_time(sql_date);
+			employee.setCollege("" + college);
+			employee.setGraduate_time("" + graduate_time);
+			employee.setDept_id(dept_id);
+			employee.setGraduate_time("" + born_date);
+			employee.setSalary_month("" + salary_month);
+			employeeService.saveEmployee(employee);
+//			String u_sql = null;
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "staff_name", "String", staff_name);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "user_account", "String", user_account);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "job_name", "String", job_name);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "age", "String", age);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "status", "String", status);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "graduate_time", "date", graduate_time);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "college", "String", college);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "dept_id", "String", "" + dept_id);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "salary_month", "String", "" + salary_month);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "join_time", "date", join_time);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "born_date", "date", born_date);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "work_year", "String", work_year);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "address", "String", address);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "work_history", "String", work_history);
+//			u_sql = SQLTool.appendUpdateSql(u_sql, "professional", "String", professional);
+//			String sql = "update tab_employee set " + u_sql + " where eid=" + eid;
+//			if (ds.update(sql, null) > 0)
+//			{
+//				logger.info("更新成功！");
+//			}
 		}
 		catch (Exception e)
 		{

@@ -5,7 +5,7 @@
  * 
  * $Id: SimpleHibernateDao.java 1205 2010-09-09 15:12:17Z calvinxiu $
  */
-package org.snaker.framework.orm.hibernate;
+package org.moon.common.db.hibernate;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
  * @author calvin
  */
 @SuppressWarnings("unchecked")
-public class SimpleHibernateDao<T, PK extends Serializable> {
+public class HibernateDao<T, PK extends Serializable> {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -60,7 +60,7 @@ public class SimpleHibernateDao<T, PK extends Serializable> {
 	 * eg.
 	 * public class UserDao extends SimpleHibernateDao<User, Long>
 	 */
-	public SimpleHibernateDao() {
+	public HibernateDao() {
 		this.entityClass = ReflectionUtils.getSuperClassGenricType(getClass());
 	}
 
@@ -70,7 +70,7 @@ public class SimpleHibernateDao<T, PK extends Serializable> {
 	 * eg.
 	 * SimpleHibernateDao<User, Long> userDao = new SimpleHibernateDao<User, Long>(sessionFactory, User.class);
 	 */
-	public SimpleHibernateDao(final SessionFactory sessionFactory, final Class<T> entityClass) {
+	public HibernateDao(final SessionFactory sessionFactory, final Class<T> entityClass) {
 		this.sessionFactory = sessionFactory;
 		this.entityClass = entityClass;
 	}

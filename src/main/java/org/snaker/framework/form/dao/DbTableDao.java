@@ -19,8 +19,8 @@ package org.snaker.framework.form.dao;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SQLQuery;
+import org.moon.common.db.hibernate.ParentHBDao;
 import org.snaker.framework.form.entity.DbTable;
-import org.snaker.framework.orm.hibernate.HibernateDao;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @since 1.0
  */
 @Component
-public class DbTableDao extends HibernateDao<DbTable, Long> {
+public class DbTableDao extends ParentHBDao<DbTable, Long> {
     private static final String DEFAULT_DELIMITER = ";";
 
     /**

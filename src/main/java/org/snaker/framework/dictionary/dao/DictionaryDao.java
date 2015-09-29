@@ -1,7 +1,7 @@
 package org.snaker.framework.dictionary.dao;
 
+import org.moon.common.db.hibernate.ParentHBDao;
 import org.snaker.framework.dictionary.entity.Dictionary;
-import org.snaker.framework.orm.hibernate.HibernateDao;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
  * @since 0.1
  */
 @Component
-public class DictionaryDao extends HibernateDao<Dictionary, Long> {
+public class DictionaryDao extends ParentHBDao<Dictionary, Long> {
 
 }

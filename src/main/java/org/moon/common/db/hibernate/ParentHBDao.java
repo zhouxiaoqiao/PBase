@@ -5,7 +5,7 @@
  * 
  * $Id: HibernateDao.java 1205 2010-09-09 15:12:17Z calvinxiu $
  */
-package org.snaker.framework.orm.hibernate;
+package org.moon.common.db.hibernate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  * 
  * @author calvin
  */
-public class HibernateDao<T, PK extends Serializable> extends SimpleHibernateDao<T, PK> {
+public class ParentHBDao<T, PK extends Serializable> extends HibernateDao<T, PK> {
 	/**
 	 * 用于Dao层子类的构造函数.
 	 * 通过子类的泛型定义取得对象类型Class.
@@ -51,7 +51,7 @@ public class HibernateDao<T, PK extends Serializable> extends SimpleHibernateDao
 	 * public class UserDao extends HibernateDao<User, Long>{
 	 * }
 	 */
-	public HibernateDao() {
+	public ParentHBDao() {
 		super();
 	}
 
@@ -61,7 +61,7 @@ public class HibernateDao<T, PK extends Serializable> extends SimpleHibernateDao
 	 * eg.
 	 * HibernateDao<User, Long> userDao = new HibernateDao<User, Long>(sessionFactory, User.class);
 	 */
-	public HibernateDao(final SessionFactory sessionFactory, final Class<T> entityClass) {
+	public ParentHBDao(final SessionFactory sessionFactory, final Class<T> entityClass) {
 		super(sessionFactory, entityClass);
 	}
 
@@ -83,7 +83,7 @@ public class HibernateDao<T, PK extends Serializable> extends SimpleHibernateDao
 	 * 
 	 * @return 分页查询结果, 附带结果列表及所有查询输入参数.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Page<T> findPage(final Page<T> page, final String hql, final Object... values) {
 		Assert.notNull(page, "page不能为空");
 
@@ -123,6 +123,7 @@ public class HibernateDao<T, PK extends Serializable> extends SimpleHibernateDao
 
 		setPageParameterToQuery(q, page);
 
+		@SuppressWarnings("rawtypes")
 		List result = q.list();
 		page.setResult(result);
 		return page;
@@ -136,7 +137,7 @@ public class HibernateDao<T, PK extends Serializable> extends SimpleHibernateDao
 	 * 
 	 * @return 分页查询结果.附带结果列表及所有查询输入参数.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Page<T> findPage(final Page<T> page, final Criterion... criterions) {
 		Assert.notNull(page, "page不能为空");
 
@@ -241,7 +242,7 @@ public class HibernateDao<T, PK extends Serializable> extends SimpleHibernateDao
 	/**
 	 * 执行count查询获得本次Criteria查询所能获得的对象总数.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected long countCriteriaResult(final Criteria c) {
 		CriteriaImpl impl = (CriteriaImpl) c;
 

@@ -105,7 +105,6 @@ public class Menu extends SecurityEntity
 		this.action = action;
 		this.open_icon = open_icon;
 		this.data = data;
-
 	}
 
 	@Column(name = "name", nullable = false, length = 200)
@@ -277,5 +276,7 @@ public class Menu extends SecurityEntity
 	{
 		this.data = data;
 	}
+
+	
 
 }

@@ -22,12 +22,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class MDBTool implements IMDBTool
 {
+	/**
+	 * 
+	 */
+	//private static final long serialVersionUID = 1822712353906451610L;
 
-	private static DataSource ds;
+	@Resource
+	protected DataSource dataSource;
 
 	private static Connection conn;
 
@@ -58,15 +65,17 @@ public class MDBTool implements IMDBTool
 	// 构造方法
 	public MDBTool()
 	{
-		ApplicationContext context = null;
+		 		ApplicationContext context = null;
 		try
 		{
-			context = new ClassPathXmlApplicationContext("applicationContext.xml");
-			if (ds == null)
-				ds = (DataSource) context.getBean("dataSource");
-			if (conn == null || conn.isClosed())
-				conn = ds.getConnection();
-		} catch (Exception e)
+			//本地使用
+						context = new ClassPathXmlApplicationContext("applicationContext.xml");
+						if (dataSource == null)
+							dataSource = (DataSource) context.getBean("dataSource");
+						if (conn == null || conn.isClosed())
+							conn = dataSource.getConnection();
+		}
+		catch (Exception e)
 		{
 			logger.error(e);
 		}
@@ -75,8 +84,7 @@ public class MDBTool implements IMDBTool
 	/*
 	 * 操作数据库设置参数(SQl语句条件) Athor zhouxiaoqiao 2010-01-20
 	 */
-	private void setParamValue(PreparedStatement theStmt, List<?> params)
-			throws Exception
+	private void setParamValue(PreparedStatement theStmt, List<?> params) throws Exception
 	{
 		setParamValue(theStmt, params, null);
 	}
@@ -89,8 +97,7 @@ public class MDBTool implements IMDBTool
 	 * @author 周小桥 |2014-6-18 下午3:55:43
 	 * @version 0.1
 	 */
-	private void setParamValue(PreparedStatement theStmt, List<?> params,
-			int type[]) throws Exception
+	private void setParamValue(PreparedStatement theStmt, List<?> params, int type[]) throws Exception
 	{
 		if (params == null || params.size() == 0)
 			return;
@@ -106,8 +113,7 @@ public class MDBTool implements IMDBTool
 				case -2:
 					if (value instanceof byte[])
 					{
-						InputStream is = new ByteArrayInputStream(
-								(byte[]) value);
+						InputStream is = new ByteArrayInputStream((byte[]) value);
 						theStmt.setBinaryStream(i + 1, is, is.available());
 					}
 					break;
@@ -117,8 +123,7 @@ public class MDBTool implements IMDBTool
 					{
 						String content = value.toString();
 						Reader reader = new StringReader(content);
-						theStmt.setCharacterStream(i + 1, reader,
-								content.length());
+						theStmt.setCharacterStream(i + 1, reader, content.length());
 					}
 					break;
 
@@ -128,7 +133,8 @@ public class MDBTool implements IMDBTool
 				}
 			}
 
-		} else
+		}
+		else
 		{
 			for (int i = 0; i < params.size(); i++)
 			{
@@ -147,8 +153,7 @@ public class MDBTool implements IMDBTool
 	 * @author 周小桥 |2014-8-8 下午4:41:41
 	 * @version 0.1
 	 */
-	private void setProcedureParamValue(PreparedStatement theStmt,
-			List<?> params, int beforecall) throws Exception
+	private void setProcedureParamValue(PreparedStatement theStmt, List<?> params, int beforecall) throws Exception
 	{
 		if (params == null || params.size() == 0)
 			return;
@@ -168,7 +173,8 @@ public class MDBTool implements IMDBTool
 				String content = value.toString();
 				int index = i + 1 + beforecall;
 				theStmt.setString(index, content);
-			} else
+			}
+			else
 				theStmt.setObject(i + 1 + beforecall, value);
 
 		}
@@ -200,11 +206,12 @@ public class MDBTool implements IMDBTool
 			for (int t = 1; t <= j; t++)
 			{
 				String keyName = mdr.getColumnName(t);
-				if (rs.getObject(keyName) instanceof Timestamp|| rs.getObject(keyName) instanceof Date)
+				if (rs.getObject(keyName) instanceof Timestamp || rs.getObject(keyName) instanceof Date)
 				{
 
 					row.put(keyName, rs.getObject(keyName).toString());
-				} else
+				}
+				else
 					row.put(keyName, rs.getObject(keyName));
 
 			}
@@ -229,7 +236,8 @@ public class MDBTool implements IMDBTool
 				resultset.close();
 				resultset = null;
 			}
-		} catch (Exception exp)
+		}
+		catch (Exception exp)
 		{
 			resultset = null;
 		}
@@ -240,7 +248,8 @@ public class MDBTool implements IMDBTool
 				psQuery.close();
 				psQuery = null;
 			}
-		} catch (Exception e1)
+		}
+		catch (Exception e1)
 		{
 			psQuery = null;
 		}
@@ -251,7 +260,8 @@ public class MDBTool implements IMDBTool
 				psUpdate.close();
 				psUpdate = null;
 			}
-		} catch (Exception e1)
+		}
+		catch (Exception e1)
 		{
 			psUpdate = null;
 		}
@@ -270,11 +280,10 @@ public class MDBTool implements IMDBTool
 			{
 				conn.close();
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
-			System.err
-					.println("\u5173\u95ED\u6570\u636E\u5E93\u8FDE\u63A5\u51FA\u9519\uFF1A"
-							+ e.getMessage());
+			System.err.println("\u5173\u95ED\u6570\u636E\u5E93\u8FDE\u63A5\u51FA\u9519\uFF1A" + e.getMessage());
 		}
 	}
 
@@ -288,16 +297,16 @@ public class MDBTool implements IMDBTool
 		try
 		{
 			if (conn == null || conn.isClosed())
-				conn = ds.getConnection();
-			psQuery = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
-					ResultSet.CONCUR_READ_ONLY);
+				conn = dataSource.getConnection();
+			psQuery = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			setParamValue(psQuery, parm);
 			resultset = psQuery.executeQuery();
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			logger.error(e);
-		} finally
+		}
+		finally
 		{
 
 		}
@@ -312,24 +321,23 @@ public class MDBTool implements IMDBTool
 	 * @author 周小桥 |2014-6-18 下午5:31:50
 	 * @version 0.1
 	 */
-	public List<JSONObject> executeJSONQuery(String sql, List<String> parm)
-			throws Exception
+	public List<JSONObject> executeJSONQuery(String sql, List<String> parm) throws Exception
 	{
 		List<JSONObject> records = null;
 		try
 		{
 			if (conn == null || conn.isClosed())
-				conn = ds.getConnection();
-			psQuery = conn
-					.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-							ResultSet.CONCUR_READ_ONLY);
+				conn = dataSource.getConnection();
+			psQuery = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			setParamValue(psQuery, parm);
 			resultset = psQuery.executeQuery();
 			records = getDataSetToJson(resultset);
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			logger.error(e);
-		} finally
+		}
+		finally
 		{
 
 		}
@@ -347,16 +355,16 @@ public class MDBTool implements IMDBTool
 		try
 		{
 			if (conn == null || conn.isClosed())
-				conn = ds.getConnection();
-			psUpdate = conn
-					.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-							ResultSet.CONCUR_UPDATABLE);
+				conn = dataSource.getConnection();
+			psUpdate = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			setParamValue(psUpdate, parm);
 			updaterecords = psUpdate.executeUpdate();
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			logger.error(e);
-		} finally
+		}
+		finally
 		{
 
 		}
@@ -377,11 +385,10 @@ public class MDBTool implements IMDBTool
 	 * @author 周小桥 |2014-8-8 下午4:42:59
 	 * @version 0.1
 	 */
-	public ResultSet executeQueryProcedure(String procedureName,
-			List<?> params, boolean scrollable) throws Exception
+	public ResultSet executeQueryProcedure(String procedureName, List<?> params, boolean scrollable) throws Exception
 	{
 		if (conn == null || conn.isClosed())
-			conn = ds.getConnection();
+			conn = dataSource.getConnection();
 		logger.info("调用存储过程！");
 		if (scrollable)
 			callprocedure = conn.prepareCall(procedureName, 1005, 1007);
@@ -395,22 +402,19 @@ public class MDBTool implements IMDBTool
 	// 对文件流操作，例如图片存取
 	@SuppressWarnings("rawtypes")
 	@Transactional(noRollbackFor = Exception.class)
-	public int executeStreamUpdate(String sql, List parm, FileInputStream stream)
-			throws Exception
+	public int executeStreamUpdate(String sql, List parm, FileInputStream stream) throws Exception
 	{
 		int updaterecords = 0;
 		try
 		{
 			if (conn == null || conn.isClosed())
-				conn = ds.getConnection();
-			psUpdate = conn
-					.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-							ResultSet.CONCUR_UPDATABLE);
+				conn = dataSource.getConnection();
+			psUpdate = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			setParamValue(psUpdate, parm);
-			psUpdate.setBinaryStream(parm.size() + 1, stream,
-					stream.available());
+			psUpdate.setBinaryStream(parm.size() + 1, stream, stream.available());
 			updaterecords = psUpdate.executeUpdate();
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -423,8 +427,7 @@ public class MDBTool implements IMDBTool
 	 */
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ArrayList<?> executeProcedure(String procedureName,
-			List<String> inparams, List<String> outparams,
+	public ArrayList<?> executeProcedure(String procedureName, List<String> inparams, List<String> outparams,
 			List<String> returnparams) throws Exception
 	{
 		ArrayList returnOutparams = new ArrayList();
@@ -435,7 +438,8 @@ public class MDBTool implements IMDBTool
 			{
 				procedureName = "{ ? = call " + procedureName;
 				returnParam = 1;// 为函数调用准备,函数有返回值
-			} else
+			}
+			else
 				procedureName = "{ call " + procedureName;
 			String tempStr = "";
 			if (inparams != null && inparams.size() > 0)
@@ -455,15 +459,14 @@ public class MDBTool implements IMDBTool
 					else
 						tempStr = tempStr + ",?";
 			}
-			if ((inparams == null || inparams.size() == 0)
-					&& (outparams == null || outparams.size() == 0))
+			if ((inparams == null || inparams.size() == 0) && (outparams == null || outparams.size() == 0))
 				tempStr = "(";
 			tempStr = tempStr + ")";
 
 			procedureName = procedureName + tempStr + " }";
 			// 设置参数
 			if (conn == null || conn.isClosed())
-				conn = ds.getConnection();
+				conn = dataSource.getConnection();
 			callprocedure = conn.prepareCall(procedureName);
 			// System.out.println("inparams="+inparams.size());
 			if (returnParam == 1)// 判断前面call是否有 ?
@@ -474,8 +477,7 @@ public class MDBTool implements IMDBTool
 			{
 				for (int i = 0; i < inparams.size(); i++)
 				{
-					this.setProcedureParamValue(callprocedure, inparams,
-							returnParam);
+					this.setProcedureParamValue(callprocedure, inparams, returnParam);
 				}
 				inparamsNums = inparams.size();
 			}
@@ -501,27 +503,41 @@ public class MDBTool implements IMDBTool
 				Object value = outparams.get(j);
 				if (value instanceof Integer)
 				{
-					returnOutparams.add(callprocedure.getInt(inparamsNums + 1
-							+ j - returnParam));// 往前移returnParam位
+					returnOutparams.add(callprocedure.getInt(inparamsNums + 1 + j - returnParam));// 往前移returnParam位
 					continue;
-				} else if (value instanceof String)
+				}
+				else if (value instanceof String)
 				{
-					returnOutparams.add(callprocedure.getString(inparamsNums
-							+ 1 + j - returnParam));
+					returnOutparams.add(callprocedure.getString(inparamsNums + 1 + j - returnParam));
 					continue;
-				} else
+				}
+				else
 				{
-					returnOutparams.add(callprocedure.getString(inparamsNums
-							+ 1 + j));
+					returnOutparams.add(callprocedure.getString(inparamsNums + 1 + j));
 					continue;
 				}
 			}
 			callprocedure.close();
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			this.closeConnection();
 		}
 		return returnOutparams;
 	}
 
+	public DataSource getDataSource()
+	{
+		return dataSource;
+	}
+	/**
+	 * 采用@Autowired按类型注入dataSource, 当有多个dataSource的时候在子类重载本函数.
+	 */
+	@Autowired
+	public void setDataSource(DataSource dataSource)
+	{
+		this.dataSource = dataSource;
+	}
+
+	
 }

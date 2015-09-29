@@ -17,8 +17,8 @@
 
 package org.snaker.framework.form.dao;
 
+import org.moon.common.db.hibernate.ParentHBDao;
 import org.snaker.framework.form.entity.Form;
-import org.snaker.framework.orm.hibernate.HibernateDao;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,5 +27,5 @@ import org.springframework.stereotype.Component;
  * @since 1.0
  */
 @Component
-public class FormDao extends HibernateDao<Form, Long> {
+public class FormDao extends ParentHBDao<Form, Long> {
 }
