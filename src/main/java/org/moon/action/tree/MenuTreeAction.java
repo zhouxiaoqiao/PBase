@@ -176,7 +176,7 @@ public class MenuTreeAction extends ActionSupport implements Preparable,
 				// System.out.println(node.getId()+"节点名字：" +
 				// node.getText()+";子节点个数：" + count);
 				src = basePath
-						+ "/Controller/loadChildNode_MenuTree.action?pid="
+						+ "/Controller/loadChildNode_MenuTree.action?parent_menu="
 						+ node.getId()+"&amp;user_id="+user_id;
 			}
 			JSONObject jsonObject = JSONObject.fromObject(node);
@@ -186,7 +186,7 @@ public class MenuTreeAction extends ActionSupport implements Preparable,
 			else
 				jsonObject.put("checked", "0");//
 			sb.append(treeTemplate.replaceAll("#text#", node.getTitle())
-					.replaceAll("#action#", "javascript:void(0);")
+					.replaceAll("#action#", jsonObject.getString("action"))
 					.replaceAll("#target#", "javascript:void(0);")
 					.replaceAll("#src#", src)
 					.replaceAll("#data#", jsonObject.toString()));
@@ -231,7 +231,7 @@ public class MenuTreeAction extends ActionSupport implements Preparable,
 		{
 			e.printStackTrace();
 		}
-		treeNode.setSrc(basePath+"/Controller/loadChildNode_MenuTree.action?pid="
+		treeNode.setSrc(basePath+"/Controller/loadChildNode_MenuTree.action?parent_menu="
 				+ treeNode.getParent().getId());
 		JSONObject jsonObject = JSONObject.fromObject(treeNode);
 		out.print(jsonObject);
@@ -276,7 +276,7 @@ public class MenuTreeAction extends ActionSupport implements Preparable,
 			MenuTreeNode temp = treeNode;
 			MenuTreeNode tempNode = treeService.queryNodeById(treeNode);
 			treeNode.setName(treeNode.getTitle());
-			treeNode.setPid(tempNode.getParent().getId());
+			treeNode.setParent_menu(tempNode.getParent().getId());
 			treeService.updateNode(treeNode);
 			JSONObject jsonObject = JSONObject.fromObject(temp);
 			out.print(jsonObject);

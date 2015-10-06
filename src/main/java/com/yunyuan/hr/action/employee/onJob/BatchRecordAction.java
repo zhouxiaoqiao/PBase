@@ -4,8 +4,6 @@
  */
 package com.yunyuan.hr.action.employee.onJob;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,7 +14,6 @@ import org.apache.struts2.ServletActionContext;
 import org.moon.action.util.BaseAction;
 import org.moon.common.util.ChinaTransCode;
 import org.moon.service.GeneralService;
- 
 
 /**
  * <b>版权信息 :</b> 2012，云技术有限公司<br/>
@@ -38,14 +35,6 @@ public class BatchRecordAction extends BaseAction
 	private Logger logger = Logger.getLogger(this.getClass());
 
 	private GeneralService ds = new GeneralService();
-
-	private int currPage;
-
-	private int pageSize;
-
-	private String sortname;
-
-	private String sortorder;
 
 	private String eid;
 
@@ -97,16 +86,15 @@ public class BatchRecordAction extends BaseAction
 					+ "','"
 					+ join_time
 					+ "','"
-					+ college
-					+ "','"
-					+ graduate_time + "'," + dept_id + "," + salary_month + ")";
+					+ college + "','" + graduate_time + "'," + dept_id + "," + salary_month + ")";
 
 			if (ds.insert(sql, null) > 0)
 			{
 				logger.info("插入成功！");
 			}
 
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -129,17 +117,15 @@ public class BatchRecordAction extends BaseAction
 		{
 			setPageParm(request);
 
-			String sql = "update tab_employee set name='" + name + "',job='"
-					+ job + "',age='" + age + "',status='" + status
-					+ "',graduate_time='" + graduate_time + "',college='"
-					+ college + "',dept_id=" + dept_id + ",salary_month="
-					+ salary_month + ",join_time='" + join_time
-					+ "' where eid=" + eid;
+			String sql = "update tab_employee set name='" + name + "',job='" + job + "',age='" + age + "',status='"
+					+ status + "',graduate_time='" + graduate_time + "',college='" + college + "',dept_id=" + dept_id
+					+ ",salary_month=" + salary_month + ",join_time='" + join_time + "' where eid=" + eid;
 			if (ds.update(sql, null) > 0)
 			{
 				logger.info("更新成功！");
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -168,8 +154,7 @@ public class BatchRecordAction extends BaseAction
 			if (did != null)
 			{
 				did = did.replaceAll(",", "','");
-				String sql = "DELETE FROM  tab_employee where eid in ('" + did
-						+ "')";
+				String sql = "DELETE FROM  tab_employee where eid in ('" + did + "')";
 				int rs = ds.delete(sql, null);
 				if (rs > 0)
 				{
@@ -177,10 +162,12 @@ public class BatchRecordAction extends BaseAction
 				}
 
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, msg);
 		}
@@ -210,17 +197,18 @@ public class BatchRecordAction extends BaseAction
 				sql = "SELECT t.*,d.name as  dept_name from tab_employee t,tab_dept d where t.dept_id=d.dept_id ";
 			if (sortname != null && !"".equals(sortname))
 			{
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname,
-						sortorder);
-			} else
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid",
-						"desc");
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
+			}
+			else
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid", "desc");
 			jsonObj.put("success", "查询成功！");
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			jsonObj.put("error", "查询失败！");
 			logger.error(e);
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, jsonObj);
 		}
@@ -254,63 +242,6 @@ public class BatchRecordAction extends BaseAction
 		request.setAttribute("sql", sql);
 
 		return "success";
-	}
-
-	/**
-	 * @param response
-	 * @param JSONObj
-	 * @author 周小桥 |2014-6-26 下午5:42:30
-	 * @version 0.1
-	 */
-	private void doJsonResponse(HttpServletResponse response, JSONObject JSONObj)
-	{
-		// 设置字符编码
-		response.setCharacterEncoding("UTF-8");
-		// 返回json对象（通过PrintWriter输出）
-		try
-		{
-			String key = "RESPCODE";
-			if (!JSONObj.containsKey(key))
-			{
-				JSONObj.put(key, "0000");
-			}
-
-			String resp = (String) JSONObj.get(key);
-
-			key = "RESPMSG";
-			if (!"0000".equals(resp) && !JSONObj.containsKey(key))
-			{
-
-				JSONObj.put(key, "操作错误");
-			}
-
-			response.getWriter().print(JSONObj);
-		} catch (IOException e)
-		{
-
-			logger.error("写JSON返回数据出错.");
-			logger.error(e);
-		}
-	}
-
-	/**
-	 * @param request
-	 * @author 周小桥 |2014-8-18 上午10:35:45
-	 * @version 0.1
-	 */
-	private void setPageParm(HttpServletRequest request)
-	{
-
-		currPage = request.getParameter("page") != null ? Integer
-				.parseInt(request.getParameter("page")) : 1;
-		pageSize = request.getParameter("rows") != null ? Integer
-				.parseInt(request.getParameter("rows")) : 1;
-		sortname = request.getParameter("sidx");
-		sortorder = request.getParameter("sord");
-		request.setAttribute("page", currPage);
-		request.setAttribute("rows", pageSize);
-		request.setAttribute("sidx", sortname);
-		request.setAttribute("sord", sortorder);
 	}
 
 	public Logger getLogger()

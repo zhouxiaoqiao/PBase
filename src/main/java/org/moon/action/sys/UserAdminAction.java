@@ -1,6 +1,4 @@
 package org.moon.action.sys;
-
-import java.io.IOException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -304,43 +302,7 @@ public class UserAdminAction   extends BaseAction
 			this.doJsonResponse(response, msg);
 		}
 	}
-
-	/**
-	 * @param response
-	 * @param JSONObj
-	 * @author 周小桥 |2014-6-26 下午5:42:30
-	 * @version 0.1
-	 */
-	private void doJsonResponse(HttpServletResponse response, JSONObject JSONObj)
-	{
-		// 设置字符编码
-		response.setCharacterEncoding("UTF-8");
-		// 返回json对象（通过PrintWriter输出）
-		try
-		{
-			String key = "RESPCODE";
-			if (!JSONObj.containsKey(key))
-			{
-				JSONObj.put(key, "0000");
-			}
-
-			String resp = (String) JSONObj.get(key);
-
-			key = "RESPMSG";
-			if (!"0000".equals(resp) && !JSONObj.containsKey(key))
-			{
-
-				JSONObj.put(key, "操作错误");
-			}
-
-			response.getWriter().print(JSONObj);
-		} catch (IOException e)
-		{
-
-			logger.error("写JSON返回数据出错.");
-			logger.error(e);
-		}
-	}
+ 
 
 	public String getUser_id()
 	{

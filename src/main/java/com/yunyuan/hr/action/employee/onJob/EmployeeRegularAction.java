@@ -4,11 +4,8 @@
  */
 package com.yunyuan.hr.action.employee.onJob;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
@@ -39,13 +36,6 @@ public class EmployeeRegularAction extends BaseAction
 
 	private GeneralService ds = new GeneralService();
 
-	private int currPage;
-
-	private int pageSize;
-
-	private String sortname;
-
-	private String sortorder;
 
 	private String eid;
 
@@ -261,63 +251,7 @@ public class EmployeeRegularAction extends BaseAction
 		return "success";
 	}
 
-	/**
-	 * @param response
-	 * @param JSONObj
-	 * @author 周小桥 |2014-6-26 下午5:42:30
-	 * @version 0.1
-	 */
-	private void doJsonResponse(HttpServletResponse response, JSONObject JSONObj)
-	{
-		// 设置字符编码
-		response.setCharacterEncoding("UTF-8");
-		// 返回json对象（通过PrintWriter输出）
-		try
-		{
-			String key = "RESPCODE";
-			if (!JSONObj.containsKey(key))
-			{
-				JSONObj.put(key, "0000");
-			}
-
-			String resp = (String) JSONObj.get(key);
-
-			key = "RESPMSG";
-			if (!"0000".equals(resp) && !JSONObj.containsKey(key))
-			{
-
-				JSONObj.put(key, "操作错误");
-			}
-
-			response.getWriter().print(JSONObj);
-		} catch (IOException e)
-		{
-
-			logger.error("写JSON返回数据出错.");
-			logger.error(e);
-		}
-	}
-
-	/**
-	 * @param request
-	 * @author 周小桥 |2014-8-18 上午10:35:45
-	 * @version 0.1
-	 */
-	private void setPageParm(HttpServletRequest request)
-	{
-
-		currPage = request.getParameter("page") != null ? Integer
-				.parseInt(request.getParameter("page")) : 1;
-		pageSize = request.getParameter("rows") != null ? Integer
-				.parseInt(request.getParameter("rows")) : 1;
-		sortname = request.getParameter("sidx");
-		sortorder = request.getParameter("sord");
-		request.setAttribute("page", currPage);
-		request.setAttribute("rows", pageSize);
-		request.setAttribute("sidx", sortname);
-		request.setAttribute("sord", sortorder);
-	}
-
+	 
 	public Logger getLogger()
 	{
 		return logger;

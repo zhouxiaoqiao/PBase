@@ -59,7 +59,7 @@ public class TreeServiceImpl implements ITreeService
 	 */
 	public void addNode(MenuTreeNode treeNode) throws Exception
 	{
-		int id = this.getAddMenuID(treeNode.getPid());
+		int id = this.getAddMenuID(treeNode.getParent_menu());
 		treeNode.setId(id);
 		if (treeNode != null)
 			generalDao.create(treeNode);
@@ -233,7 +233,7 @@ public class TreeServiceImpl implements ITreeService
 		int menu_size = 10;
 		try
 		{
-			List<JSONObject> m_l = this.getMenus("select max(id) id from sec_menu where  pid=" + pid);
+			List<JSONObject> m_l = this.getMenus("select max(id) id from sec_menu where  parent_menu=" + pid);
 
 			if (m_l != null && m_l.size() > 0)
 			{
@@ -247,7 +247,7 @@ public class TreeServiceImpl implements ITreeService
 						for (; i <= menu_size; i++)
 						{
 							addMenuID = addMenuID - i;
-							m_l = this.getMenus("select  id from sec_menu where  pid=" + pid + " and id=" + ""
+							m_l = this.getMenus("select  id from sec_menu where parent_menu=" + pid + " and id=" + ""
 									+ addMenuID);
 							if (m_l == null)
 								break;

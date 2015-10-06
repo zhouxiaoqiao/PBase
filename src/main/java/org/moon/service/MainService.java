@@ -31,17 +31,17 @@ public class MainService
 	 * @author 周小桥 |2014-6-24 下午2:31:48
 	 * @version 0.1
 	 */
-	private List<Menu> getSubMenus(String pid, String user_id)
+	private List<Menu> getSubMenus(String parent_menu, String user_id)
 	{
 		List<Menu> menus = new ArrayList<Menu>();
 		String sql = null;
 		if ("admin".equals(user_id))
 		{
-			sql = " select m.id ,m.name ,m.url,m.action from sec_menu m where m.pid='" + pid + "' ";
+			sql = " select m.id ,m.name ,m.url,m.action from sec_menu m where m.parent_menu='" + parent_menu + "' ";
 		}
 		else
 		{
-			sql = "select m.id ,m.name ,m.url,m.action from sec_menu m,tab_user_menu t where m.pid='" + pid
+			sql = "select m.id ,m.name ,m.url,m.action from sec_menu m,tab_user_menu t where m.parent_menu='" + parent_menu
 					+ "' and t.user_id='" + user_id + "' " + "and m.id=t.menu_id";
 		}
 		try
@@ -87,11 +87,11 @@ public class MainService
 		ResultSet rows = null;
 		if ("admin".equals(user_id))
 		{
-			sql = " select m.id ,m.name ,m.pid,m.url,m.action from sec_menu m ";
+			sql = " select m.id ,m.name ,m.parent_menu,m.url,m.action from sec_menu m ";
 		}
 		else
 		{
-			sql = "select m.id ,m.name ,m.pid,m.url,m.action from sec_menu m where  m.id in ("
+			sql = "select m.id ,m.name ,m.parent_menu,m.url,m.action from sec_menu m where  m.id in ("
 					+ " select t.menu_id from tab_user_menu t where t.user_id='" + user_id + "' ) or m.id= " + pid;
 
 		}
@@ -103,7 +103,7 @@ public class MainService
 			{
 				JSONObject menu = new JSONObject();
 				menu.put("id", "" + rows.getLong("id"));
-				menu.put("pid", "" + rows.getLong("pid"));
+				menu.put("pid", "" + rows.getLong("parent_menu"));
 				menu.put("text", rows.getString("name"));
 				menu.put("url", rows.getString("url"));
 				menu.put("action", rows.getString("action"));

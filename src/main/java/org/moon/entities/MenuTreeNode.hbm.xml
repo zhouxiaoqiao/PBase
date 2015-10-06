@@ -7,14 +7,14 @@
         </id>
         <property name="title"/>
         <property name="src"/>
-        <property name="action"/>
+        <property name="action" />
         <property name="icon"/>
         <property name="open_icon"/>
         <property name="target"/>
         <property name="data"/>
-        <property name="url"/>
+        <property name="url"  />
         <property name="name"/>
-        <many-to-one name="parent" class="org.moon.entities.MenuTreeNode" column="pid"/>
+        <many-to-one name="parent" class="org.moon.entities.MenuTreeNode" column="parent_menu"/>
     </class>
     
       <query name="queryRootNode">

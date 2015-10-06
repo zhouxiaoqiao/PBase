@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
 import com.alibaba.fastjson.JSON;
@@ -16,7 +18,7 @@ import com.alibaba.fastjson.JSON;
 
 public class BaseAction  
 {
-
+	private Logger logger = Logger.getLogger(this.getClass());
 	public JSONObject result;// 返回的json
 
 	public String pageNumber;// 每页显示的记录数
@@ -119,6 +121,62 @@ public class BaseAction
 		data_json.put("pageSize", this.pageSize);
 		data_json.put("pageNumber", this.pageNumber);
 		return data_json;
+	}
+	/**
+	 * 
+	 * @param request
+	 * @author 周小桥 |2015-10-5 上午10:23:20
+	 * @version 0.1
+	 */
+	public void setPageParm(HttpServletRequest request)
+	{
+
+		currPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+		pageSize = request.getParameter("rows") != null ? Integer.parseInt(request.getParameter("rows")) : 1;
+		sortname = request.getParameter("sidx");
+		sortorder = request.getParameter("sord");
+		request.setAttribute("page", currPage);
+		request.setAttribute("rows", pageSize);
+		request.setAttribute("sidx", sortname);
+		request.setAttribute("sord", sortorder);
+		
+
+	}
+	/**
+	 * @param response
+	 * @param JSONObj
+	 * @author 周小桥 |2014-6-26 下午5:42:30
+	 * @version 0.1
+	 */
+	public void doJsonResponse(HttpServletResponse response, JSONObject JSONObj)
+	{
+		// 设置字符编码
+		response.setCharacterEncoding("UTF-8");
+		// 返回json对象（通过PrintWriter输出）
+		try
+		{
+			String key = "RESPCODE";
+			if (!JSONObj.containsKey(key))
+			{
+				JSONObj.put(key, "0000");
+			}
+
+			String resp = (String) JSONObj.get(key);
+
+			key = "RESPMSG";
+			if (!"0000".equals(resp) && !JSONObj.containsKey(key))
+			{
+
+				JSONObj.put(key, "操作错误");
+			}
+
+			response.getWriter().print(JSONObj);
+		} catch (IOException e)
+		{
+
+			logger.error("写JSON返回数据出错.");
+			logger.error(e);
+		}
 	}
 
 	/**

@@ -67,9 +67,8 @@ public class MenuController {
 	 */
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable("id") Long id, Model model) {
-		Menu m=menuManager.get(id);
-		model.addAttribute("menu", m);
-		System.out.println(m.getUrl());
+		Menu menu=menuManager.get(id);
+		model.addAttribute("menu", menu);
 		return "security/menuEdit";
 	}
 	
@@ -80,8 +79,7 @@ public class MenuController {
 	 * @return
 	 */
 	@RequestMapping(value = "view/{id}", method = RequestMethod.GET)
-	public String view(@PathVariable("id") Long id, Model model) {
-		
+	public String view(@PathVariable("id") Long id, Model model) {		
 		model.addAttribute("menu",menuManager.get(id) );
 		return "security/menuView";
 	}
@@ -95,7 +93,7 @@ public class MenuController {
 	public String update(Menu menu, Long parentMenuId) {
 		if(parentMenuId != null && parentMenuId.longValue() >= 0) {
 			Menu parent = new Menu(parentMenuId);
-			menu.setPid(parent);
+			menu.setParentMenu(parent);
 		}
 		menuManager.save(menu);
 		return "redirect:/security/menu";

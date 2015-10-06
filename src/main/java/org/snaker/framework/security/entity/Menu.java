@@ -10,9 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.context.annotation.Lazy;
-
+ 
 /**
  * 菜单实体类，继承抽象安全实体类
  * @author yuqs
@@ -40,7 +38,7 @@ public class Menu extends SecurityEntity
 	private Integer orderby;
 
 	// 上级菜单
-	private Menu pid;
+	private Menu parentMenu;
 
 	// 菜单链接
 	private String url;
@@ -65,7 +63,7 @@ public class Menu extends SecurityEntity
 
 	// 子菜单列表（多对多关联）
 
-	private List<Menu> subMenus = new ArrayList<Menu>();
+	//private List<Menu> subMenus = new ArrayList<Menu>();
 
 	public Menu()
 	{}
@@ -129,32 +127,17 @@ public class Menu extends SecurityEntity
 		this.description = description;
 	}
 
-
-
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "pid")
-	public List<Menu> getSubMenus()
-	{
-		return subMenus;
-	}
-
 	@ManyToOne
-	@JoinColumn(name = "pid")
-	@Lazy
-	public Menu getPid()
+	@JoinColumn(name = "parentMenu")
+	public Menu getParentMenu()
 	{
-		return pid;
+		return parentMenu;
 	}
-
-	public void setPid(Menu pid)
+	public void setParentMenu(Menu parentMenu)
 	{
-		this.pid = pid;
+		this.parentMenu = parentMenu;
 	}
-
-	public void setSubMenus(List<Menu> subMenus)
-	{
-		this.subMenus = subMenus;
-	}
+	
 
 	@Column(name = "orderby")
 	public Integer getOrderby()

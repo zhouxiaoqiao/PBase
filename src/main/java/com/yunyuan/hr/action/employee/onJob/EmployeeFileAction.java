@@ -4,17 +4,25 @@
  */
 package com.yunyuan.hr.action.employee.onJob;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import net.sf.json.JSONObject;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import org.moon.action.util.BaseAction;
 import org.moon.common.util.ChinaTransCode;
+import org.moon.common.util.DateUtil;
 import org.moon.service.GeneralService;
+import org.snaker.framework.security.entity.Org;
+import org.snaker.framework.security.entity.Role;
+import org.snaker.framework.security.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.yunyuan.hr.entity.Employee;
 import com.yunyuan.hr.service.EmployeeService;
 import com.yunyuan.util.KeyUtil;
@@ -73,6 +81,8 @@ public class EmployeeFileAction extends BaseAction
 
 	private String address;
 
+	private String auth_json;
+
 	/**
 	 * @param mapping
 	 * @param form
@@ -102,8 +112,7 @@ public class EmployeeFileAction extends BaseAction
 			employee.setProfessional("" + professional);
 			employee.setAge("" + age);
 			employee.setStatus("" + status);
-			java.sql.Date sql_date = java.sql.Date.valueOf(join_time);
-			employee.setJoin_time(sql_date);
+			employee.setJoin_time(DateUtil.StrngTOSQLDate(join_time));
 			employee.setCollege("" + college);
 			employee.setGraduate_time("" + graduate_time);
 			employee.setDept_id(dept_id);
@@ -171,10 +180,10 @@ public class EmployeeFileAction extends BaseAction
 	public String update()
 	{
 		logger.info("update");
-	//	HttpServletRequest request = ServletActionContext.getRequest();
+		//	HttpServletRequest request = ServletActionContext.getRequest();
 		try
 		{
-			
+
 			Employee employee = new Employee();
 			employee.setEid("" + eid);
 			employee.setStaff_name("" + staff_name);
@@ -195,27 +204,27 @@ public class EmployeeFileAction extends BaseAction
 			employee.setGraduate_time("" + born_date);
 			employee.setSalary_month("" + salary_month);
 			employeeService.saveEmployee(employee);
-//			String u_sql = null;
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "staff_name", "String", staff_name);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "user_account", "String", user_account);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "job_name", "String", job_name);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "age", "String", age);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "status", "String", status);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "graduate_time", "date", graduate_time);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "college", "String", college);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "dept_id", "String", "" + dept_id);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "salary_month", "String", "" + salary_month);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "join_time", "date", join_time);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "born_date", "date", born_date);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "work_year", "String", work_year);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "address", "String", address);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "work_history", "String", work_history);
-//			u_sql = SQLTool.appendUpdateSql(u_sql, "professional", "String", professional);
-//			String sql = "update tab_employee set " + u_sql + " where eid=" + eid;
-//			if (ds.update(sql, null) > 0)
-//			{
-//				logger.info("更新成功！");
-//			}
+			//			String u_sql = null;
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "staff_name", "String", staff_name);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "user_account", "String", user_account);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "job_name", "String", job_name);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "age", "String", age);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "status", "String", status);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "graduate_time", "date", graduate_time);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "college", "String", college);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "dept_id", "String", "" + dept_id);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "salary_month", "String", "" + salary_month);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "join_time", "date", join_time);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "born_date", "date", born_date);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "work_year", "String", work_year);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "address", "String", address);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "work_history", "String", work_history);
+			//			u_sql = SQLTool.appendUpdateSql(u_sql, "professional", "String", professional);
+			//			String sql = "update tab_employee set " + u_sql + " where eid=" + eid;
+			//			if (ds.update(sql, null) > 0)
+			//			{
+			//				logger.info("更新成功！");
+			//			}
 		}
 		catch (Exception e)
 		{
@@ -350,6 +359,76 @@ public class EmployeeFileAction extends BaseAction
 	}
 
 	/**
+	 * 
+	 * 
+	 * @author 周小桥 |2015-10-6 下午4:11:02
+	 * @version 0.1
+	 */
+	public void initLoginAuthor()
+	{
+		logger.info("initPage");
+		HttpServletRequest request = ServletActionContext.getRequest();
+		HttpServletResponse response = ServletActionContext.getResponse();
+
+		JSONObject jsonObj = new JSONObject();
+		String sql = null;
+		try
+		{
+			setPageParm(request);
+			if (dept_id == null)
+			{
+				dept_id = 200;
+			}
+			sql = request.getParameter("sql");
+			if (sql == null || "".equals(sql) || "null".equals(sql))
+				sql = "SELECT e.*,s.name as  dept_name from tab_employee e,sec_org s where e.status='1' and e.dept_id  in (select id  from sec_org g where FIND_IN_SET(g.id, getChildLst("
+						+ dept_id + ")))  and e.dept_id=s.id   ";
+			if (sortname != null && !"".equals(sortname))
+			{
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
+			}
+			else
+				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid", "desc");
+			jsonObj.put("success", "查询成功！");
+
+		}
+		catch (Exception e)
+		{
+			jsonObj.put("error", "查询失败！");
+			logger.error(e);
+		}
+		finally
+		{
+			this.doJsonResponse(response, jsonObj);
+		}
+
+	}
+
+	/**
+	 * 
+	 * 
+	 * @author 周小桥 |2015-10-6 下午5:12:52
+	 * @version 0.1
+	 */
+	public String authEmployeeLogin()
+	{
+		logger.info("auth_json====" + auth_json);
+		User user = new User();
+		Org org = new Org(2003l);
+		user.setOrg(org);
+		user.setFullname("周天昂");
+		Role usual = new Role();
+		usual.setId(2l);
+		user.getRoles().add(usual);
+		user.setUsername("zhouta");
+		user.setPassword("123456");
+		employeeService.authEmployeeLogin(user);
+
+		//initLoginAuthor ();
+		return "success";
+	}
+
+	/**
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -376,62 +455,6 @@ public class EmployeeFileAction extends BaseAction
 		request.setAttribute("sql", sql);
 
 		return "success";
-	}
-
-	/**
-	 * @param response
-	 * @param JSONObj
-	 * @author 周小桥 |2014-6-26 下午5:42:30
-	 * @version 0.1
-	 */
-	private void doJsonResponse(HttpServletResponse response, JSONObject JSONObj)
-	{
-		// 设置字符编码
-		response.setCharacterEncoding("UTF-8");
-		// 返回json对象（通过PrintWriter输出）
-		try
-		{
-			String key = "RESPCODE";
-			if (!JSONObj.containsKey(key))
-			{
-				JSONObj.put(key, "0000");
-			}
-
-			String resp = (String) JSONObj.get(key);
-
-			key = "RESPMSG";
-			if (!"0000".equals(resp) && !JSONObj.containsKey(key))
-			{
-
-				JSONObj.put(key, "操作错误");
-			}
-
-			response.getWriter().print(JSONObj);
-		}
-		catch (IOException e)
-		{
-
-			logger.error("写JSON返回数据出错.");
-			logger.error(e);
-		}
-	}
-
-	/**
-	 * @param request
-	 * @author 周小桥 |2014-8-18 上午10:35:45
-	 * @version 0.1
-	 */
-	private void setPageParm(HttpServletRequest request)
-	{
-
-		currPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-		pageSize = request.getParameter("rows") != null ? Integer.parseInt(request.getParameter("rows")) : 1;
-		sortname = request.getParameter("sidx");
-		sortorder = request.getParameter("sord");
-		request.setAttribute("page", currPage);
-		request.setAttribute("rows", pageSize);
-		request.setAttribute("sidx", sortname);
-		request.setAttribute("sord", sortorder);
 	}
 
 	public Logger getLogger()
@@ -602,6 +625,16 @@ public class EmployeeFileAction extends BaseAction
 	public void setBorn_date(String born_date)
 	{
 		this.born_date = born_date;
+	}
+
+	public String getAuth_json()
+	{
+		return auth_json;
+	}
+
+	public void setAuth_json(String auth_json)
+	{
+		this.auth_json = auth_json;
 	}
 
 }

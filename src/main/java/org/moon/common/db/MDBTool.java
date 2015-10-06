@@ -21,15 +21,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Resource;
 import javax.sql.DataSource;
-
 import net.sf.json.JSONObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +42,7 @@ public class MDBTool implements IMDBTool
 	 */
 	//private static final long serialVersionUID = 1822712353906451610L;
 
-	@Resource
+	  
 	protected DataSource dataSource;
 
 	private static Connection conn;
@@ -525,7 +520,7 @@ public class MDBTool implements IMDBTool
 		}
 		return returnOutparams;
 	}
-
+	 
 	public DataSource getDataSource()
 	{
 		return dataSource;
@@ -533,7 +528,7 @@ public class MDBTool implements IMDBTool
 	/**
 	 * 采用@Autowired按类型注入dataSource, 当有多个dataSource的时候在子类重载本函数.
 	 */
-	@Autowired
+	 
 	public void setDataSource(DataSource dataSource)
 	{
 		this.dataSource = dataSource;

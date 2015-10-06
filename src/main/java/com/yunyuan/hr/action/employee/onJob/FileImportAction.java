@@ -5,10 +5,8 @@
 package com.yunyuan.hr.action.employee.onJob;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +17,12 @@ import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import org.moon.common.util.ChinaTransCode;
-import org.moon.service.ExcelImportService;
 import org.moon.service.GeneralService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.ActionSupport;
-import com.yunyuan.util.FileAdmin;
+import com.yunyuan.hr.service.EmployeeService;
+import com.yunyuan.util.FileAdminUtil;
 
 /**
  * <b>版权信息 :</b> 2012，云技术有限公司<br/>
@@ -38,7 +37,6 @@ public class FileImportAction extends ActionSupport
 	 * 
 	 */
 	private static final long serialVersionUID = -949122781455369656L;
-
 	/**
 	 * Method execute
 	 * @param mapping
@@ -51,7 +49,9 @@ public class FileImportAction extends ActionSupport
 
 	private GeneralService ds = new GeneralService();
 
-	ExcelImportService eis = new ExcelImportService();
+	//注入 对象
+	@Autowired
+	private EmployeeService employeeService;
 
 	private int currPage;
 
@@ -93,14 +93,19 @@ public class FileImportAction extends ActionSupport
 	 * @author 周小桥 |2015-9-24 下午3:25:14
 	 * @version 0.1
 	 */
-	public InputStream getDownloadFile() throws FileNotFoundException, UnsupportedEncodingException
+	public void getDownloadFile() throws FileNotFoundException, UnsupportedEncodingException
 	{
 		logger.info("getDownloadFile");
-		//HttpServletRequest request = ServletActionContext.getRequest();
-		//String path = request.getPathInfo()getRealPath("/upload");
-		InputStream inputStream = new FileInputStream("E:/logs/test.xls");
+		 HttpServletRequest request = ServletActionContext.getRequest();
+		 HttpServletResponse response=ServletActionContext.getResponse();
+		 FileAdminUtil fdu=new FileAdminUtil();
+		 fdu.downloadFile(request,response, "employee_file.xls");
+		 
 
-		return   inputStream;//ServletActionContext.getServletContext().getResourceAsStream("E:/logs/test/xls");
+		// out.clear();
+		// out = pageContext.pushBody();
+	 
+		//return "success";  
 	}
 
 	// 下载
@@ -108,6 +113,7 @@ public class FileImportAction extends ActionSupport
 	{
 		return "success";
 	}
+
 
 	/**
 	 * @param mapping
@@ -120,35 +126,15 @@ public class FileImportAction extends ActionSupport
 	public String importExcel() throws Throwable
 	{
 		logger.info("importExcel");
-		HttpServletRequest request = ServletActionContext.getRequest();
+		//HttpServletRequest request = ServletActionContext.getRequest();
 		//String import_path=request.getParameter("import_path");
 		//HttpServletResponse response = ServletActionContext.getResponse();
 		try
 		{
-
-			FileAdmin.uploadFile(request, upload_file, fileName);
+			employeeService.importEmployeeFile(upload_file);
+			//FileAdmin.uploadFile(request, upload_file, fileName);
 			//setPageParm(request);
-			String eid = "" + System.currentTimeMillis();
-			String sql = "INSERT  INTO tab_employee (eid,name,job,age,status,join_time,college,graduate_time,dept_id,salary_month) VALUES ('"
-					+ eid
-					+ "','"
-					+ name
-					+ "','"
-					+ job
-					+ "','"
-					+ age
-					+ "','"
-					+ status
-					+ "','"
-					+ join_time
-					+ "','"
-					+ college + "','" + graduate_time + "'," + dept_id + "," + salary_month + ")";
-
-			//			if (ds.insert(sql, null) > 0)
-			//			{
-			//				logger.info("插入成功！");
-			//			}
-
+			
 		}
 		catch (Exception e)
 		{
@@ -249,8 +235,13 @@ public class FileImportAction extends ActionSupport
 		{
 			setPageParm(request);
 			sql = request.getParameter("sql");
+			if (dept_id == null)
+			{
+				dept_id = 200;
+			}
 			if (sql == null || "".equals(sql) || "null".equals(sql))
-				sql = "SELECT t.*,d.name as  dept_name from tab_employee t,tab_dept d where t.dept_id=d.dept_id ";
+				sql = "SELECT e.*,s.name as  dept_name from tab_employee e,sec_org s where e.dept_id  in (select id  from sec_org g where FIND_IN_SET(g.id, getChildLst("
+						+ dept_id + ")))  and e.dept_id=s.id   ";
 			if (sortname != null && !"".equals(sortname))
 			{
 				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
@@ -354,16 +345,6 @@ public class FileImportAction extends ActionSupport
 		request.setAttribute("rows", pageSize);
 		request.setAttribute("sidx", sortname);
 		request.setAttribute("sord", sortorder);
-	}
-
-	public Logger getLogger()
-	{
-		return logger;
-	}
-
-	public void setLogger(Logger logger)
-	{
-		this.logger = logger;
 	}
 
 	public String getEid()

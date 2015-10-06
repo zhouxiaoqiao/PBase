@@ -19,7 +19,7 @@ public class BeanTest
 		IGeneralDao generalDao = (IGeneralDao) context.getBean("generalDao");
 		MenuTreeNode rootNode = new MenuTreeNode();
 		MenuTreeNode paNode = new MenuTreeNode();
-		paNode.setPid(0);
+		paNode.setParent_menu(0);
 		rootNode.setParent(paNode);
 		List<?> queryList = (List<?>) generalDao.query("queryRootNode");
 		MenuTreeNode treeNode = new MenuTreeNode();

@@ -20,7 +20,7 @@ public class MenuTreeNode extends PageInfo
 
 	private String data = "";
 
-	private Integer pid;
+	private Integer parent_menu;
 
 	private String url = "";
 
@@ -55,17 +55,17 @@ public class MenuTreeNode extends PageInfo
 	}
 
 
-	public Integer getPid()
+	public Integer getParent_menu()
 	{
-		return pid;
+		return parent_menu;
 	}
 
-	public void setPid(Integer pid)
+	public void setParent_menu(Integer parent_menu)
 	{
-		this.pid = pid;
+		this.parent_menu = parent_menu;
 		if (parent == null)
 			parent = new MenuTreeNode();
-		parent.setId(pid);
+		parent.setId(parent_menu);
 	}
 
 	public String getTitle()
