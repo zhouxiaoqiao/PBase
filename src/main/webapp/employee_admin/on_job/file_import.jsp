@@ -7,6 +7,8 @@ String basePath = request.getScheme() + "://"
 		+ path + "/";
 String action=(String)request.getParameter("action");
 PageUtil pu=new PageUtil(request,action);
+
+
  
 %>
 
@@ -47,7 +49,7 @@ PageUtil pu=new PageUtil(request,action);
 			colNames:['序号','员工名','年龄','入职日期','毕业院校','职业状态','毕业时间','部门名','部门','薪资','工作经验'],
 			colModel:[						
 				{name:'eid',index:'rowindex',sortable:false,editable:false,width:30,hidden:true},				
-				{name:'name',index:'name',sortable:true,editable:true,width:30,editable:true,editoptions:{readonly:false,rows:"1",cols:"65"}},
+				{name:'staff_name',index:'staff_name',sortable:true,editable:true,width:30,editable:true,editoptions:{readonly:false,rows:"1",cols:"65"}},
 				{name:'age',index:'age',sortable:true,editable:true,width:30},
 				{name:'join_time',index:'join_time',sortable:true,editable:true,width:30},
 				{name:'college',index:'college',sortable:true,editable:true,width:30},
@@ -56,7 +58,7 @@ PageUtil pu=new PageUtil(request,action);
 				{name:'dept_name',index:'dept_name',sortable:true,editable:true,width:30},
 				{name:'dept_id',index:'dept_id',sortable:true,editable:true,hidden:true},
 				{name:'salary_month',index:'salary_month',sortable:true,editable:true,width:30},
-				{name:'job',index:'job',sortable:false,editable:true,width:60,edittype:'textarea'}
+				{name:'work_history',index:'work_history',sortable:false,editable:true,width:60,edittype:'textarea'}
 			],
 			viewrecords:true,  
 			page:'<%=pu.getPage()%>',
@@ -110,10 +112,7 @@ PageUtil pu=new PageUtil(request,action);
 	<table id="dataTableId"></table>
 	<div id="pagerId" class="scroll"></div>
 	<input type="hidden" id="method" value="">
-	<input type="hidden" id="printURL"
-		value="<%=pu.getBasePath()%>frameset?__report=report_admin/design/emp.rptdesign&whereSQL=<%=pu.getWhereSQL_print()%>">
-	 
-	 	<div id="editUnitDiv"style="visibility: hidden">
+	<div id="editUnitDiv"style="visibility: hidden">
 	
 	 <table width="100%" border="0" align="center" cellpadding="0"
 				class="table_all_border" cellspacing="0" style="margin-bottom: 0px;border-bottom: 0px">
@@ -204,4 +203,5 @@ function display_importPath( ) {
 
 	}
 </script>
+
 </html>

@@ -39,11 +39,13 @@ body {
 
 </head>
 <body>
-	<div id="con"></div>
+	<div id="tree_operDiv">
+	<div id="con" style="font-size: 12px;"></div>
 	<button onclick="displayAdd()">新增</button>
 	<button onclick="displayEdit()">修改</button>
 	<button onclick="delNode()">删除</button>
 	<button onclick="flushNode()">刷新</button>
+	</div>
 	<div id="editTreeDiv" style="display: none">
 		<table style="width: 100%; font-size: 12px;">
 			<tr id="pid_tr">
@@ -61,18 +63,24 @@ body {
 					type="hidden" id="url_bak" value=""></td>
 			</tr>
 			<tr>
+				<td>action</td>
+				<td><input type="text" id="action" name="action" />
+				 </td>
+			</tr>
+			<tr>
 				<td><button onclick="submitOper()">确定</button>
 					<button onclick="editCancel()">取消</button></td>
 			</tr>
 		</table>
 	</div>
-	<div id="radioDiv"></div>
+	<div id="radioDiv"  style="font-size: 12px;"></div>
 
 
 </body>
 <script type="text/javascript">
 	var oper = '';
 	function displayAdd() {
+		document.getElementById("tree_operDiv").style.display = "none";
 		document.getElementById("editTreeDiv").style.display = "";
 		document.getElementById("title").value = "";
 		oper = 'add';
@@ -80,16 +88,19 @@ body {
 		document.getElementById("editID_td").innerHTML = "新建菜单名";
 		$('#url').val("");
 	}
-	function displayEdit() {
+	function displayEdit() {		
+		document.getElementById("tree_operDiv").style.display = "none";
 		document.getElementById("editTreeDiv").style.display = "";
 		document.getElementById("pid_tr").style.display = "none";
 		oper = 'edit';
 		document.getElementById("editID_td").innerHTML = "编辑菜单名";
 		document.getElementById("title").value = document
 				.getElementById("pname").value;
-		$('#url').val($('#url_bak').val());
+		//$('#action').val($('#action_bak').val());
+
 	}
 	function submitOper() {
+		document.getElementById("tree_operDiv").style.display = "";
 		var pid = document.getElementById("pid").value;
 		if (pid != '') {
 			if (oper == 'add')
@@ -113,11 +124,13 @@ body {
 		}
 		$('#pname').val(data.title);
 		$('#pid').val(data.id);
-		if (oper == 'edit') {
+		if (oper != 'add') {
 			$('#title').val(data.title);
 			$('#url').val(data.url);
+			$('#action').val(data.action);
+			$('#url').val(data.url);
 		}
-		$('#url_bak').val(data.url);
+	
 		window.parent.frames['right_belong'].location.reload();
 	}
 </script>

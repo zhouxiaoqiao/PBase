@@ -73,7 +73,7 @@
 						${menu.name}&nbsp;
 					</td>
 					<td class="td_list_2" align=left nowrap>
-						${menu.pid.name}&nbsp;
+						${menu.parentMenu.name}&nbsp;
 					</td>
 					<td class="td_list_2" align=left nowrap>
 				    <c:choose>

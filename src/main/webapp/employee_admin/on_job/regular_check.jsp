@@ -72,7 +72,7 @@ PageUtil pu=new PageUtil(request,action);
 					multiselect : true,
 					onSelectRow : function(rowid) {
 						
-					
+						initUserOperate();
 
 					},
 					caption : "员工信息表"

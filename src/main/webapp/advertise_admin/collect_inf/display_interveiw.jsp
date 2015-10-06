@@ -83,8 +83,7 @@ var dept_id ='200';
 			search : false,
 			edit : false
 		}), initOperateWindow(add_url, edit_url, query_display, del_url,
-				print_display,"eid")
-	});
+				print_display,"eid");});
 </script>
 </head>
 <body>
@@ -152,7 +151,6 @@ function editCol(rowData) {
 	$('#china_name').attr('value', rowData.china_name);
 	$('#tel').attr('value', rowData.tel);
 	$('#age').attr('value', rowData.age);
-
 	 
 	$('#college').attr('value', rowData.college);
 	

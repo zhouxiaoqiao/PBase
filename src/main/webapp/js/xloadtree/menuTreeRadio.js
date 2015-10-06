@@ -80,11 +80,11 @@ function addNode(){
 	var treeNode = new Object();
 	treeNode.title = $("#title").val();
 	if($("#url").val()=='')
-		treeNode.url ='javascript:void(0);';
+		treeNode.url ='';
 	else
 	    treeNode.url = $("#url").val();
-	treeNode.pid = $("#pid").val();
-
+	treeNode.parent_menu = $("#pid").val();
+	treeNode.action = $("#action").val();
 	if(treeNode.title==''){
 		alert('title必须填写!');
 		return;
@@ -187,6 +187,7 @@ function editNode(){
 	}
 	var treeNode = new Object();
 	treeNode.title = $("#title").val();
+	treeNode.action = $("#action").val();
 	if($("#url").val()=='')
 		treeNode.url ='javascript:void(0);';
 	else

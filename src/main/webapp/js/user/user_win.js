@@ -342,7 +342,6 @@ if (del_url!=null&&del_url.length>0) {
 					var deletes = "";
 					var mulsel = $("#dataTableId")
 							.getGridParam('selarrrow');
-                           alert(del_url);
 					if (mulsel.length == 0) {
 
 					} else {

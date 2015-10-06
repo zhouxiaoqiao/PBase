@@ -5,6 +5,9 @@
 <html lang="en">
 	<head>
 		<title>菜单管理</title>
+		<%	 
+		request.setAttribute("subMenus", request.getAttribute("subMenus"));
+		%>
 		<%@ include file="/common/meta.jsp"%>
 		<link rel="stylesheet" href="${ctx}/styles/css/style.css" type="text/css" media="all" />
 		<link rel="stylesheet" type="text/css" href="${ctx}/styles/wbox/wbox/wbox.css" />
@@ -33,6 +36,7 @@
 				iframewbox.close();
 			}
 		}
+	
 		</script>
 	</head>
 
@@ -63,11 +67,13 @@
 						<span>上级菜单：</span>
 					</td>
 					<td class="td_table_2" colspan="3">
+				    	 
 					    <input type="hidden" id="title" name="title" value="${menu.title}">
 					    <input type="hidden" id="action" name="action" value="${menu.action}">
 					    <input type="hidden" id="url" name="url" value="${menu.url}">
-						<input type="hidden" id="parentMenuId" name="parentMenuId" value="${menu.pid.id}">
-						<input type="text" id="parentMenuName" readonly="readonly" name="parentMenuName" class="input_240" value="${menu.pid.name }">
+					  	       
+						<input type="hidden" id="parentMenuId" name="parentMenuId" value="${menu.parentMenu.id}">
+						<input type="text" id="parentMenuName" readonly="readonly" name="parentMenuName" class="input_240" value="${menu.parentMenu.name }">
 						<input type='button' class='button_70px' value='上级菜单' id="selectMenu" onclick="openMenu()"/>
 					</td>
 				</tr>
