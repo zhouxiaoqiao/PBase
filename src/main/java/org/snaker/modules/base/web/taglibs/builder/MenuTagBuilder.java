@@ -54,8 +54,8 @@ public class MenuTagBuilder implements TagBuilder {
 			/**
 			 * 判断是否有上一级菜单，如果有，则添加到上一级菜单的Map中去 如果没有上一级菜单，把该菜单作为根节点
 			 */
-			Long parentMenuId = menu.getPid() == null ? Menu.ROOT_MENU
-					: menu.getPid().getId();
+			Long parentMenuId = menu.getParentMenu() == null ? Menu.ROOT_MENU
+					: menu.getParentMenu().getId();
 			if (!menuMap.containsKey(parentMenuId)) {
 				List<Menu> subMenus = new ArrayList<Menu>();
 				subMenus.add(menu);
