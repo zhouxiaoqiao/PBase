@@ -11,6 +11,10 @@
 			<result name="edit">/advertise_admin/collect_inf/edit_interview.jsp</result>
 			<result name="error">/common/500.jsp</result>
 		</action>
-		
+		<action name="resumeImport_*"
+			class="com.yunyuan.hr.action.adver.collect.ResumeImportAction" method="{1}">
+			<result name="success">/advertise_admin/collect_inf/batch_import.jsp?action=/adminAdvetise/resumeImport_</result>		
+			<result name="error">/common/500.jsp</result>
+		</action>
 	</package>
 </struts>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.yunyuan.hr.entity.Interviewer" table="tab_advertise">
+		<id name="eid" column="eid">
+			<generator class="assigned" /> <!-- 主键由外部程序负责生成，在 save() 之前指定一个。 -->
+		</id>
+		<property name="china_name" />
+		<property name="age" />
+		<property name="college" />
+		<property name="address" />
+		<property name="interest" />
+		<property name="graduate_time" />
+		<property name="professional" />
+		<property name="tel" />
+		<property name="born_date" />
+		<property name="adver_way" />
+		<property name="work_history" />
+		<property name="interview_person" />
+		<property name="interview_date" />
+		<property name="hope_salary" />
+		<property name="fact_salary" />
+		<property name="employ_status" />
+		<property name="qual_cert" />
+		<property name="sex" />
+		<property name="come_date" />
+		<property name="interview_evaluate" />
+	</class>
+
+
+
+</hibernate-mapping>

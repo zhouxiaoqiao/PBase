@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.yunyuan.hr.entity.Employee" table="tab_employee">
+        <id name="eid" column="eid">
+            <generator class="assigned" /> <!-- 主键由外部程序负责生成，在   save()   之前指定一个。  -->
+        </id>
+        <property name="staff_name"/>
+        <property name="job_name"/>      
+        <property name="age"/>
+        <property name="status"/>
+        <property name="join_time"/>        
+        <property name="college"/>
+        <property name="graduate_time"/>
+        <property name="salary_month"/>  
+        <property name="dept_id"/>
+        <property name="full_name"/>
+        <property name="user_account"/>                  
+        <property name="work_history"/>
+        <property name="born_date"/>
+        <property name="professional"/>  
+        <property name="work_year"/>
+        <property name="address"/>
+    </class>
+    
+       
+   	 
+</hibernate-mapping>

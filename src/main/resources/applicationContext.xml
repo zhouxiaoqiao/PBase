@@ -12,7 +12,8 @@
 	<description>Spring公共配置 </description>
 	<import resource="platform.xml" />
 	<context:annotation-config />
-	<context:component-scan base-package="org.snaker,org.moon" />
+	<!--使用了注解 @Autowired,@Component @Resource 必须在此扫描 -->
+	<context:component-scan base-package="org.snaker,org.moon,com.yunyuan.hr" />
 
 	<!-- Hibernate配置 专用 树 -->
 	<bean id="sessionFactory_tree"
@@ -30,7 +31,7 @@
 		<property name="sessionFactory" ref="sessionFactory_tree"></property>
 	</bean>
 
-	<!-- Hibernate配置 spring  -->
+	<!-- Hibernate配置 spring -->
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -38,6 +39,7 @@
 			<bean class="org.hibernate.cfg.ImprovedNamingStrategy" />
 		</property>
 		<property name="hibernateProperties" ref="hibernateProperties" />
+		<!--snake流程 -->
 		<property name="packagesToScan">
 			<list>
 				<value>org.snaker.framework.security.entity</value>
@@ -56,7 +58,12 @@
 				<value>hbm/snaker.surrogate.hbm.xml</value>
 			</list>
 		</property>
-
+		<!-- 20150928添加 -->
+		<property name="mappingLocations">
+			<list>
+				<value>classpath*:com/yunyuan/hr/entity/*.hbm.xml</value>
+			</list>
+		</property>
 	</bean>
 
 	<bean id="executor" class="org.snaker.modules.base.service.ScriptsExecutor"
@@ -109,11 +116,11 @@
 		<aop:advisor advice-ref="txAdvice"
 			pointcut="execution(* org.snaker.engine.core..*.*(..))
 		or execution(* org.snaker.modules.*.service..*.*(..))
-		or execution(* org.snaker.framework.*.service..*.*(..))" />
+		or execution(* org.snaker.framework.*.service..*.*(..))
+		or execution(* com.yunyuan.hr.service..*.*(..))" />
 	</aop:config>
 	<aop:config>
-		<aop:pointcut id="transactionPointcut"
-			expression="execution(* org.moon.service..*.*(..))" />
+		<aop:pointcut id="transactionPointcut" expression="execution(* org.moon.service..*.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="transactionPointcut" />
 	</aop:config>
 

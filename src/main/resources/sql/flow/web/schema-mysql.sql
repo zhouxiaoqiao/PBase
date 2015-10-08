@@ -1,7 +1,7 @@
 CREATE TABLE `sec_menu` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(200) NOT NULL,
-  `pid` bigint(20) DEFAULT NULL,
+  `parent_menu` bigint(20) DEFAULT NULL,
   `orderby` int(11) DEFAULT '0',
   `url` varchar(100) DEFAULT NULL,
   `title` varchar(20) DEFAULT NULL,
