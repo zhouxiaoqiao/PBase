@@ -196,7 +196,7 @@ public class RegularRecordAction extends BaseAction
 			setPageParm(request);
 			sql = request.getParameter("sql");
 			if (sql == null || "".equals(sql) || "null".equals(sql))
-				sql = "SELECT t.*,d.name as  dept_name from tab_employee t,sec_org d where t.dept_id=d.id ";
+				sql = "SELECT t.*,d.name as  dept_name from tab_employee t,sec_org d where t.dept_id=d.id and t.status in ('2','3')";
 			if (sortname != null && !"".equals(sortname))
 			{
 				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname,

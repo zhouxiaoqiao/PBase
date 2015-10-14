@@ -4,25 +4,18 @@
  */
 package com.yunyuan.hr.action.employee.onJob;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.sf.json.JSONObject;
-
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import org.moon.action.util.BaseAction;
 import org.moon.common.util.ChinaTransCode;
 import org.moon.common.util.DateUtil;
 import org.moon.service.GeneralService;
-import org.snaker.framework.security.entity.Org;
-import org.snaker.framework.security.entity.Role;
-import org.snaker.framework.security.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.yunyuan.hr.entity.Employee;
 import com.yunyuan.hr.service.EmployeeService;
 import com.yunyuan.util.KeyUtil;
@@ -46,7 +39,7 @@ public class EmployeeFileAction extends BaseAction
 	 */
 	private Logger logger = Logger.getLogger(this.getClass());
 
-	private GeneralService ds = new GeneralService();
+	private GeneralService generalService = new GeneralService();
 	@Autowired
 	EmployeeService employeeService;
 
@@ -258,7 +251,7 @@ public class EmployeeFileAction extends BaseAction
 			{
 				did = did.replaceAll(",", "','");
 				String sql = "DELETE FROM  tab_employee where eid in ('" + did + "')";
-				int rs = ds.delete(sql, null);
+				int rs = generalService.delete(sql, null);
 				if (rs > 0)
 				{
 					msg.put("success", "删除" + rs + "条数据 成功！");
@@ -292,7 +285,7 @@ public class EmployeeFileAction extends BaseAction
 			logger.info("keyID==" + keyID);
 			String sql = "SELECT u.*,s.name as  dept_name from tab_employee u,sec_org s where  u.eid=" + keyID
 					+ "  and u.dept_id=s.id   ";
-			List<JSONObject> jl = ds.query(sql, null);
+			List<JSONObject> jl = generalService.query(sql, null);
 			// JSONObject data_ret = new JSONObject();
 			jsonObj = jl.get(0);
 
@@ -339,10 +332,10 @@ public class EmployeeFileAction extends BaseAction
 						+ dept_id + ")))  and e.dept_id=s.id   ";
 			if (sortname != null && !"".equals(sortname))
 			{
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
+				jsonObj = generalService.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
 			}
 			else
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid", "desc");
+				jsonObj = generalService.getPageQuery(sql, currPage, pageSize, "eid", "desc");
 			jsonObj.put("success", "查询成功！");
 
 		}
@@ -366,7 +359,7 @@ public class EmployeeFileAction extends BaseAction
 	 */
 	public void initLoginAuthor()
 	{
-		logger.info("initPage");
+		logger.info("initLoginAuthor");
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 
@@ -385,10 +378,10 @@ public class EmployeeFileAction extends BaseAction
 						+ dept_id + ")))  and e.dept_id=s.id   ";
 			if (sortname != null && !"".equals(sortname))
 			{
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
+				jsonObj = generalService.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
 			}
 			else
-				jsonObj = ds.getPageQuery(sql, currPage, pageSize, "eid", "desc");
+				jsonObj = generalService.getPageQuery(sql, currPage, pageSize, "eid", "desc");
 			jsonObj.put("success", "查询成功！");
 
 		}
@@ -410,22 +403,29 @@ public class EmployeeFileAction extends BaseAction
 	 * @author 周小桥 |2015-10-6 下午5:12:52
 	 * @version 0.1
 	 */
-	public String authEmployeeLogin()
+	public void authEmployeeLogin()
 	{
 		logger.info("auth_json====" + auth_json);
-		User user = new User();
-		Org org = new Org(2003l);
-		user.setOrg(org);
-		user.setFullname("周天昂");
-		Role usual = new Role();
-		usual.setId(2l);
-		user.getRoles().add(usual);
-		user.setUsername("zhouta");
-		user.setPassword("123456");
-		employeeService.authEmployeeLogin(user);
+		String ret_auth = null;
+		JSONObject msg = new JSONObject();
+		if (auth_json != null)
+		{
+			ret_auth = employeeService.batchAuthEmployeeLogin(auth_json);
+			if (ret_auth.contains("fail"))
+			{
+				msg.put("success", "fail");			 
+			}
+			else
+				msg.put("success", "success");
 
-		//initLoginAuthor ();
-		return "success";
+		}
+		else
+		{
+			msg.put("success", "fail");
+		}
+		msg.put("ret_auth", ret_auth);
+		this.writeJson(msg);
+		//return "author";
 	}
 
 	/**
@@ -441,12 +441,18 @@ public class EmployeeFileAction extends BaseAction
 		logger.info("doFind");
 		HttpServletRequest request = ServletActionContext.getRequest();
 		// HttpServletResponse response = ServletActionContext.getResponse();
-		String sql = "SELECT * from tab_employee ";
+		if (dept_id == null)
+		{
+			dept_id = 200;
+		}
+		String sql = "SELECT e.*,s.name as  dept_name from tab_employee e,sec_org s where e.status='1' and e.dept_id  in (select id  from sec_org g where FIND_IN_SET(g.id, getChildLst("
+				+ dept_id + ")))  and e.dept_id=s.id   ";
 		setPageParm(request);
 		if (request.getParameter("where") != null)
 		{
 			String whereSQL_print = request.getParameter("where");
 			whereSQL_print = ChinaTransCode.getJspUTFSubmmit(whereSQL_print);
+			whereSQL_print=" and "+whereSQL_print.replace("where", "");//去掉where;因为sql已有where
 			sql = sql + whereSQL_print;
 			// 转成打印传出条件语句
 			whereSQL_print = whereSQL_print.replaceAll("=", ":");

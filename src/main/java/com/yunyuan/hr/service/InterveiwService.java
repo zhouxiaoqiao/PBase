@@ -8,7 +8,6 @@ import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.moon.common.excel.ExcelReader;
 import org.moon.common.util.ReflectUtil;
-import org.snaker.engine.core.AccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.yunyuan.hr.dao.InterviewerDao;
@@ -16,7 +15,7 @@ import com.yunyuan.hr.entity.Interviewer;
 import com.yunyuan.util.KeyUtil;
 
 @Component
-public class InterveiwService extends AccessService
+public class InterveiwService  
 {
 	//注入 对象
 	@Autowired

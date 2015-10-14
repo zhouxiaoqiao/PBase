@@ -77,7 +77,7 @@ function selectDept() {
  * @param selectName
  */
 function getSelectAjax(selectID, selectName) {
-	var url = getBasePath() + '/main.do?method=getSelectData&selectName='+ selectName;
+	var url = getBasePath() + '/sysAdmin/main_getSelectData.action?selectName='+ selectName;
 	var sel = document.getElementById(selectID);
 	clearSelect(selectID);
 	$.ajax({

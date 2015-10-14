@@ -32,7 +32,7 @@ $(function(){
 		$.ajax({  
         async:false,  
         type:"POST",  
-        url:"<%=basePath%>/main/main_getMenuTree.action?user_id="+user_id,  
+        url:"<%=basePath%>/sysAdmin/main_getMenuTree.action?user_id="+user_id,  
         dataType:"json",  
         cache: false,
         success:function(datas){

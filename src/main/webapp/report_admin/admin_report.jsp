@@ -1,7 +1,7 @@
 <%@ page language="java" import="java.util.*,com.yunyuan.util.PageUtil" pageEncoding="UTF-8"%>
 <%
 	
-	PageUtil pu=new PageUtil(request,"/adminReport/adminReport_");
+	PageUtil pu=new PageUtil(request,"/sysAdmin/adminReport_");
 %>
 
 

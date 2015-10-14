@@ -4,7 +4,7 @@
 	String basePath = request.getScheme() + "://"
 			+ request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
-	String url = basePath + "/adminReport/adminReport_";
+	String url = basePath + "/sysAdmin/adminReport_";
 	String sql = null;
 	if (request.getAttribute("sql") != null)
 		sql = (String) request.getAttribute("sql");

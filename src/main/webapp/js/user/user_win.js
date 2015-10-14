@@ -326,8 +326,10 @@ if (query) {
 	jQuery("#dataTableId").navButtonAdd('#pagerId', {
 		caption : "查找",
 		onClickButton : function() {
-			$(".findWin").show(1000);
-
+			if(document.getElementById("findUnitDiv").style.visibility != "visible")
+		        document.getElementById("findUnitDiv").style.visibility = "visible";
+			else
+				document.getElementById("findUnitDiv").style.visibility = "hidden";
 		}
 	});
 

@@ -27,8 +27,6 @@
 	href="<%=basePath%>/styles/wbox/wbox/wbox.css" />
 <%@include file="/common/use_js.jsp"%>
 <title>用户信息修改</title>
-<style type="text/css">
-</style>
 
 <script type="text/javascript">
 

@@ -8,6 +8,7 @@
 		<action name="employeeFile_*"
 			class="com.yunyuan.hr.action.employee.onJob.EmployeeFileAction" method="{1}">
 			<result name="success">/employee_admin/on_job/display_employee.jsp?action=/adminEmployee/employeeFile_</result>
+			<result name="author">/employee_admin/on_job/author_employee.jsp?action=/adminEmployee/employeeFile_</result>
 			<result name="edit">/employee_admin/on_job/edit_employee.jsp</result>
 			<result name="error">/common/500.jsp</result>
 		</action>
@@ -39,6 +40,12 @@
 		<action name="regularRecord_*"
 			class="com.yunyuan.hr.action.employee.onJob.RegularRecordAction" method="{1}">
 			<result name="success">/employee_admin/on_job/regular_record.jsp</result>
+			<result name="fail">/common/500.jsp</result>
+		</action>
+		
+		<action name="employeeDimission_*"
+			class="com.yunyuan.hr.action.employee.offJob.EmployeeDimissionAction" method="{1}">
+			<result name="success">/employee_admin/off_job/dimission_apply.jsp</result>
 			<result name="fail">/common/500.jsp</result>
 		</action>
 	</package>

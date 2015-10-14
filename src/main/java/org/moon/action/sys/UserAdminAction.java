@@ -1,13 +1,20 @@
 package org.moon.action.sys;
+
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import net.sf.json.JSONObject;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
-import org.moon.common.util.ChinaTransCode;
 import org.moon.action.util.BaseAction;
+import org.moon.common.util.ChinaTransCode;
 import org.moon.service.GeneralService;
+import org.snaker.framework.security.entity.User;
+import org.snaker.framework.security.service.UserManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * <b>版权信息 :</b> 2012，云技术有限公司<br/>
@@ -15,7 +22,7 @@ import org.moon.service.GeneralService;
  * <b>版本历史 :</b> <br/>
  * @author 周小桥| 2014-6-18 下午7:07:56 | 创建
  */
-public class UserAdminAction   extends BaseAction
+public class UserAdminAction extends BaseAction
 {
 	private String user_id;
 
@@ -24,6 +31,13 @@ public class UserAdminAction   extends BaseAction
 	private String user_name;
 
 	private String dept_id;
+	
+	private String email;
+	
+	private String full_name;
+
+	@Autowired
+	private UserManager userManager;
 
 	/**
 	 * Method execute
@@ -51,26 +65,39 @@ public class UserAdminAction   extends BaseAction
 		try
 		{
 
-			String sql = "INSERT  INTO sec_user (username,fullname,password,org) VALUES ('"
-					+ user_id
-					+ "','"
-					+ user_name
-					+ "','"
-					+ password
-					+ "','"
-					+ ChinaTransCode.getJspUTFSubmmit(dept_id) + "')";
+			String sql = "INSERT  INTO sec_user (username,fullname,password,org) VALUES ('" + user_id + "','"
+					+ user_name + "','" + password + "','" + ChinaTransCode.getJspUTFSubmmit(dept_id) + "')";
 
 			if (gs.insert(sql, null) > 0)
 			{
 				logger.info("插入成功！");
 			}
 
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 
 		return "success";
+	}
+
+	/**
+	 * 	
+	 * 
+	 * @author 周小桥 |2015-10-10 下午2:39:44
+	 * @version 0.1
+	 */
+	public String updateUser()
+	{
+		User user = userManager.findUserByName(user_name);
+		user.setPassword(password);
+		user.setPlainPassword(password);
+		user.setFullname(full_name);
+		user.setEmail(email);
+		userManager.save(user);
+		return "edit_user";
+		
 	}
 
 	/**
@@ -88,14 +115,14 @@ public class UserAdminAction   extends BaseAction
 		try
 		{
 
-			String sql = "update sec_user set fullname='" + user_name
-					+ "',password='" + password + "',org='" + dept_id
+			String sql = "update sec_user set fullname='" + user_name + "',password='" + password + "',org='" + dept_id
 					+ "' where username='" + user_id + "'";
 			if (gs.update(sql, null) > 0)
 			{
 				logger.info("更新成功！");
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -104,7 +131,8 @@ public class UserAdminAction   extends BaseAction
 		{
 
 			return "edit_user";
-		} else
+		}
+		else
 			return "success";
 	}
 
@@ -128,8 +156,7 @@ public class UserAdminAction   extends BaseAction
 			if (did != null)
 			{
 				did = did.replaceAll(",", "','");
-				String sql = "DELETE FROM  tab_user where user_id in ('" + did
-						+ "')";
+				String sql = "DELETE FROM  tab_user where user_id in ('" + did + "')";
 				int rs = gs.delete(sql, null);
 				if (rs > 0)
 				{
@@ -137,10 +164,12 @@ public class UserAdminAction   extends BaseAction
 				}
 
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, msg);
 		}
@@ -160,10 +189,8 @@ public class UserAdminAction   extends BaseAction
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		JSONObject jsonObj = new JSONObject();
-		int currPage = request.getParameter("page") != null ? Integer
-				.parseInt(request.getParameter("page")) : 1;
-		int pageSize = request.getParameter("rows") != null ? Integer
-				.parseInt(request.getParameter("rows")) : 1;
+		int currPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+		int pageSize = request.getParameter("rows") != null ? Integer.parseInt(request.getParameter("rows")) : 1;
 		String sortname = request.getParameter("sidx");
 		String sortorder = request.getParameter("sord");
 		String sql = null;
@@ -175,17 +202,18 @@ public class UserAdminAction   extends BaseAction
 				sql = "select u.*,d.name as dept_name from  sec_user u, sec_org d where  u.org=d.id ";
 			if (sortname != null && !"".equals(sortname))
 			{
-				jsonObj = gs.getPageQuery(sql, currPage, pageSize, sortname,
-						sortorder);
-			} else
-				jsonObj = gs.getPageQuery(sql, currPage, pageSize, "username",
-						"desc");
+				jsonObj = gs.getPageQuery(sql, currPage, pageSize, sortname, sortorder);
+			}
+			else
+				jsonObj = gs.getPageQuery(sql, currPage, pageSize, "username", "desc");
 			jsonObj.put("success", "查询成功！");
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			jsonObj.put("error", "查询失败！");
 			logger.error(e);
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, jsonObj);
 		}
@@ -238,23 +266,25 @@ public class UserAdminAction   extends BaseAction
 			if (user_id != null)
 			{
 
-				String sql = "select *from  sec_user where username ='"
-						+ user_id + "'";
+				String sql = "select *from  sec_user where username ='" + user_id + "'";
 				List<JSONObject> rs = gs.query(sql, null);
 				msg.put("success", true);
 				if (rs.isEmpty())
 				{
 					msg.put("result", "合法帐号!");
-				} else
+				}
+				else
 				{
 					msg.put("result", "帐号已经存在，请重新输入！");
 				}
 
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, msg);
 		}
@@ -280,29 +310,31 @@ public class UserAdminAction   extends BaseAction
 			if (user_id != null)
 			{
 
-				String sql = "select u.*,d.name as dept_name from  sec_user u, sec_org d where user_id='"
-						+ user_id + "' and u.org=d.id";
+				String sql = "select u.*,d.name as dept_name from  sec_user u, sec_org d where username='" + user_id
+						+ "' and u.org=d.id";
 				List<JSONObject> rs = gs.query(sql, null);
 				msg.put("success", true);
 				msg.put("record", rs);
 				if (rs != null && rs.isEmpty())
 				{
 					msg.put("result", "合法帐号!");
-				} else
+				}
+				else
 				{
 					msg.put("result", "帐号已经存在，请重新输入！");
 				}
 
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
-		} finally
+		}
+		finally
 		{
 			this.doJsonResponse(response, msg);
 		}
 	}
- 
 
 	public String getUser_id()
 	{
@@ -342,6 +374,26 @@ public class UserAdminAction   extends BaseAction
 	public void setDept_id(String dept_id)
 	{
 		this.dept_id = dept_id;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
+
+	public String getFull_name()
+	{
+		return full_name;
+	}
+
+	public void setFull_name(String full_name)
+	{
+		this.full_name = full_name;
 	}
 
 }

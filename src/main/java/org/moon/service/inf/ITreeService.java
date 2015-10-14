@@ -27,6 +27,8 @@ public interface ITreeService
 
 	JSONObject getUserRightMenus(String userID) throws Exception;
 
-	boolean updateMenuRight(String userID, String checkedBoxIDs,
-			String uncheckedBoxIDs) throws Exception;
+	boolean updateMenuRight(String userID, String checkedBoxIDs, String uncheckedBoxIDs);
+
+	boolean deleteUserMenuRight(String userID);
+
 }

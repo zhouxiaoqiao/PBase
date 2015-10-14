@@ -45,6 +45,7 @@ public class UserManager {
 	 */
 	public void delete(Long id) {
 		userDao.delete(id);
+		
 	}
 	
 	/**
@@ -155,10 +156,11 @@ public class UserManager {
 	 */
 	private void entryptPassword(User user) {
 		byte[] salt = Digests.generateSalt(SALT_SIZE);
-		user.setSalt(EncodeUtils.hexEncode(salt));
+		String tmp =EncodeUtils.hexEncode(salt);
+		user.setSalt(tmp);
 
 		byte[] hashPassword = Digests.sha1(user.getPlainPassword().getBytes(), salt, HASH_INTERATIONS);
 		user.setPassword(EncodeUtils.hexEncode(hashPassword));
 	}
-
+	 
 }

@@ -3,24 +3,27 @@ package com.yunyuan.hr.service;
 import java.io.File;
 import java.util.List;
 
+import javax.annotation.Resource;
+
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.moon.common.excel.ExcelReader;
 import org.moon.common.util.ReflectUtil;
-import org.snaker.engine.core.AccessService;
+import org.moon.service.inf.ITreeService;
 import org.snaker.framework.security.entity.Org;
+import org.snaker.framework.security.entity.Role;
 import org.snaker.framework.security.entity.User;
 import org.snaker.framework.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.yunyuan.hr.dao.EmployeeDao;
 import com.yunyuan.hr.entity.Employee;
 import com.yunyuan.util.KeyUtil;
 
 @Component
-public class EmployeeService extends AccessService
+public class EmployeeService 
 {
 	//注入 对象
 	@Autowired
@@ -28,7 +31,8 @@ public class EmployeeService extends AccessService
 	//注入用户管理对象
 	@Autowired
 	private UserManager userManager;
-	
+	@Resource
+	private ITreeService treeService;
 	ReflectUtil reflectUtil = new ReflectUtil();
 	ExcelReader excelReader = new ExcelReader();
 	public Logger logger = Logger.getLogger(this.getClass());
@@ -71,19 +75,57 @@ public class EmployeeService extends AccessService
 		}
 		logger.info("导入结束!");
 	}
+
+	
 	/**
-	 * 
-	 * @param user
-	 * @author 周小桥 |2015-10-6 下午5:12:30
+	 * 	
+	 * @param json_user
+	 * @author 周小桥 |2015-10-9 上午10:48:14
 	 * @version 0.1
 	 */
-	public void authEmployeeLogin(User user){
-	
-		userManager.save(user);
-	}
-	
-	public void batchAuthEmployeeLogin(){
-		
-		
+	public String batchAuthEmployeeLogin(String json_user)
+	{
+		String ret_auth = "";
+		if (json_user != null)
+		{
+			ReflectUtil rf = new ReflectUtil();
+
+			JSONArray emps = JSONArray.fromObject(json_user);
+			for (int i = 0; i < emps.size(); i++)
+			{
+				JSONObject tmp = emps.getJSONObject(i);
+				//检查用户是否已经存在
+				User find_u = userManager.findUserByName(tmp.getString("username"));
+				if (find_u != null)
+				{
+					ret_auth = tmp.getString("username") + "已经存在,赋权fail." + ret_auth;
+					continue ;
+				}
+
+				//插入赋权可以登录系统
+				User user = new User();
+				Org org = new Org(Long.parseLong(tmp.getString("org")));
+				tmp.remove("org");
+				long roleID = Long.parseLong(tmp.getString("roleID"));
+				tmp.remove("roleID");
+				rf.setObjectVal(user, tmp);
+				//设置部门
+				user.setOrg(org);
+				//设置普通角色
+				Role usual = new Role();
+				usual.setId(roleID);//
+				user.getRoles().add(usual);
+
+				userManager.save(user);
+				//赋予基本的菜单权限
+				String checkedBoxIDs = "10,100,1001,15,156";
+				if (treeService.updateMenuRight(user.getUsername(), checkedBoxIDs, null))
+					logger.info(user.getUsername() + " 菜单树赋权成功! ");
+				else
+					logger.info(user.getUsername() + " 菜单树赋权失败! ");
+
+			}
+		}
+		return ret_auth;
 	}
 }

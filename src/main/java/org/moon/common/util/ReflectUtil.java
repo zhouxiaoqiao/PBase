@@ -5,6 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
+import org.snaker.framework.security.entity.Org;
+import org.snaker.framework.security.entity.User;
+
 import com.yunyuan.hr.entity.Employee;
 
 public class ReflectUtil
@@ -64,7 +67,7 @@ public class ReflectUtil
 						else if (field.getType() == java.sql.Date.class)
 							setMethod.invoke(object, new Object[] { DateUtil.StrngTOSQLDate(tmp) });
 						else
-							setMethod.invoke(object, new Object[] { json.get(fieldName) });
+							setMethod.invoke(object,  new Object[] {json.get(fieldName)});
 					}
 					else
 						logger.info(fieldName+":空值对象");
@@ -108,14 +111,16 @@ public class ReflectUtil
 	public static void main(String[] args)
 	{
 		JSONObject json = new JSONObject();
-		Employee ep = new Employee();
-		json.put("staff_name", "zxq");
-		json.put("join_time", "2015-06-14");
-		json.put("dept_id", "55");
+		User user = new User();
+		json.put("username", "zxq");
+		json.put("address", "sss");
+	 
+		Org org = new Org(23l);
+		//json.put("org", org);
 		ReflectUtil rf = new ReflectUtil();
 
-		rf.setObjectVal(ep, json);
-		System.out.println(ep.getStaff_name()+"/"+ep.getJoin_time());
+		rf.setObjectVal(user, json);
+		System.out.println(user.getUsername()+"/"+user.getAddress());
 
 	}
 

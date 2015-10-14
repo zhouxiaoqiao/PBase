@@ -12,10 +12,9 @@
 	String action = (String) request.getParameter("action");
 	String method = (String) request.getParameter("method");
 	PageUtil pu = new PageUtil(request, action);
-	String keyID = request.getParameter("keyID");
-	String getEditData_url = pu.getUrl();
-	getEditData_url = getEditData_url + "editData.action?keyID="
-			+ keyID;
+	 
+	String getInitEmp_url = basePath+"/adminEmployee/employeeLeave_getEmpInf.action";
+
 	//System.out.println("getEditData_url===" + getEditData_url);
 %>
 <head>
@@ -31,7 +30,26 @@
 </style>
 
 <script type="text/javascript">
+var init_url="<%=getInitEmp_url%>?user_account="+ parent.document.getElementById('user_id').value;
+$.ajax({
+	type : 'POST',
+	url : init_url,
+	dataType : 'json',
+	success : function(msg) {
+		if (msg.success) {
+			var rs = msg.record;
+			$('#eid').val(rs[0].eid);
+			$('#staff_name').val(rs[0].staff_name);			
+			$('#dept_name').val(rs[0].dept_name);
+			$('#dept_id').val(rs[0].dept_id);
+			$('#join_time').val(rs[0].join_time);
 
+		}
+
+		else
+			alert('返回失败！');
+	}
+});
 </script>
 </head>
 <body>
@@ -53,14 +71,14 @@
 				<tr>
 					<td class="td_table_1">中文姓名</td>
 					<td class="td_table_2"><input type='text' name='staff_name'
-						id='staff_name' /> <input type="hidden" id="eid" name='eid'
+						id='staff_name' disabled/> <input type="hidden" id="eid" name='eid'
 						value="" /></td>
 					<td class="td_table_1">入职时间</td>
 					<td class="td_table_2"><input type="text" name='join_time'
-						id='join_time' value='' onFocus="WdatePicker()" /></td>
+						id='join_time' disabled onFocus="WdatePicker()" /></td>
 					<td class="td_table_1">应转正日期</td>
-					<td class="td_table_2"><input type='text' name='born_date'
-						id='born_date' onFocus="WdatePicker()" /></td>
+					<td class="td_table_2"><input type='text' name='join_date'
+						id='join_date' onFocus="WdatePicker()" /></td>
 				</tr>
 			
 		
@@ -88,54 +106,13 @@
 
 </body>
 <script type="text/javascript">
- if("<%=method%>"=="update"){
-	var data_ret; 
-      getDataByAjax("<%=getEditData_url%>", "initDataRet", data_ret);
-
-	}
-
-	function initDataRet(data_ret) {
-		document.getElementById("eid").value = data_ret.eid;
-		document.getElementById("staff_name").value = data_ret.staff_name;
-		document.getElementById("user_account").value = data_ret.user_account;
-		document.getElementById("age").value = data_ret.age;
-		document.getElementById("college").value = data_ret.college;
-		document.getElementById("graduate_time").value = data_ret.graduate_time;
-		document.getElementById("dept_name").value = data_ret.dept_name;
-		document.getElementById("dept_id").value = data_ret.dept_id;
-		document.getElementById("salary_month").value = data_ret.salary_month;
-		document.getElementById("graduate_time").value = data_ret.graduate_time;
-		document.getElementById("status").value = data_ret.status;
-		document.getElementById("work_history").value = data_ret.work_history;
-		document.getElementById("born_date").value = data_ret.born_date;
-		document.getElementById("professional").value = data_ret.professional;
-		document.getElementById("work_year").value = data_ret.work_year;
-		document.getElementById("job_name").value = data_ret.job_name;
-		document.getElementById("address").value = data_ret.address;
-		document.getElementById("join_time").value = data_ret.join_time;
-		
-		
-
-	}
+ 
 
 	function clearWin() {
 
+		document.getElementById("join_date").value = "";
 		document.getElementById("staff_name").value = "";
-		document.getElementById("user_account").value = "";
-		document.getElementById("age").value = "";
-		document.getElementById("college").value = "";
-		document.getElementById("graduate_time").value = "";
-		document.getElementById("dept_name").value = "";
-		document.getElementById("dept_id").value = "";
-		document.getElementById("salary_month").value = "";
-
-		document.getElementById("status").value = "";
-		document.getElementById("work_history").value = "";
-		document.getElementById("born_date").value = "";
-		document.getElementById("professional").value = "";
-		document.getElementById("work_year").value = "";
-		document.getElementById("job_name").value = "";
-		document.getElementById("address").value = "";
+	 
 
 	}
 </script>

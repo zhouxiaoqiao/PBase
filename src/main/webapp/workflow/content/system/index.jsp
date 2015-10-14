@@ -8,9 +8,6 @@
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
 <meta http-equiv="expires" content="0">
-<meta http-equiv="keywords" content="余额,账务,帐务">
-<meta http-equiv="description" content="余额管理界面">
-
 <link rel="stylesheet" type="text/css"
 	href="js/jquery-easyui-1.4.2/themes/default/easyui.css">
 <link rel="stylesheet" type="text/css"

@@ -121,9 +121,10 @@ public class TreeServiceImpl implements ITreeService
 			return (MenuTreeNode) list.get(0);
 		return new MenuTreeNode();
 	}
-/**
- * 
- */
+
+	/**
+	 * 
+	 */
 	public JSONObject getUserRightMenus(String userID) throws Exception
 	{
 		JSONObject ms = new JSONObject();
@@ -159,7 +160,7 @@ public class TreeServiceImpl implements ITreeService
 	 * @author 周小桥 |2014-7-29 下午3:59:48
 	 * @version 0.1
 	 */
-	public boolean updateMenuRight(String userID, String checkedBoxIDs, String uncheckedBoxIDs) throws Exception
+	public boolean updateMenuRight(String userID, String checkedBoxIDs, String uncheckedBoxIDs) 
 	{
 		boolean ret = false;
 		if (userID != null && (checkedBoxIDs != null || uncheckedBoxIDs != null))
@@ -213,9 +214,34 @@ public class TreeServiceImpl implements ITreeService
 			}
 			finally
 			{
-//				if (db != null)
-//					db.closeConnection();
+				//				if (db != null)
+				//					db.closeConnection();
 			}
+		}
+		return ret;
+	}
+/**
+ * 
+ * @param userID
+ * @return
+ * @author 周小桥 |2015-10-9 下午2:33:49
+ * @version 0.1
+ */
+	public boolean deleteUserMenuRight(String userID)  
+	{
+		boolean ret = false;
+		 
+		String delSql = "delete from tab_user_menu where user_id='" + userID + "' ";
+			 
+		try
+		{
+			if (db.executeUpdate(delSql, null) > 0)
+				ret = true;
+		}
+		catch (Exception e)
+		{
+			logger.equals(e);
+			e.printStackTrace();
 		}
 		return ret;
 	}

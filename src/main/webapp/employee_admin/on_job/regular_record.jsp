@@ -48,7 +48,7 @@ PageUtil pu=new PageUtil(request,action);
 				{name:'age',index:'age',sortable:true,editable:true,width:30},
 				{name:'join_time',index:'join_time',sortable:true,editable:true,width:30},
 				{name:'college',index:'college',sortable:true,editable:true,width:30},
-				{name:'status',index:'status',sortable:true,edittype:"select",editable:true,formatter:'select',editoptions:{value:"2:试用期;3:延长试用期"},width:30},
+				{name:'status',index:'status',sortable:true,edittype:"select",editable:true,formatter:'select',editoptions:{value:"1:在职状态;0:离职状态;2:试用期;3:延长试用期"},width:30},
 				{name:'graduate_time',index:'graduate_time',sortable:true,width:30},			
 				{name:'dept_name',index:'dept_name',sortable:true,editable:true,width:30},
 				{name:'dept_id',index:'dept_id',sortable:true,editable:true,hidden:true},
@@ -71,14 +71,16 @@ PageUtil pu=new PageUtil(request,action);
 					rowList : [ 10, 15, 20 ], //可调整每页显示的记录数 
 					multiselect : true,
 					onSelectRow : function(rowid) {
-						
-						document.getElementById("editUnitDiv").style.visibility = "visible";
-						  var rowData = $("#dataTableId").getRowData(rowid);
+						if(document.getElementById("editUnitDiv").style.visibility != "visible")
+					        document.getElementById("editUnitDiv").style.visibility = "visible";
+						else
+							document.getElementById("editUnitDiv").style.visibility = "hidden";
+ 						  var rowData = $("#dataTableId").getRowData(rowid);
 							$('#staff_name').attr('value', rowData.staff_name);
 							$('#eid').attr('value', rowData.rowid);
 
 					},
-					caption : "员工信息表"
+					caption : "员工转正表"
 				});
 		jQuery("#dataTableId").jqGrid('navGrid', '#pagerId', {
 			add : false,
@@ -142,46 +144,7 @@ PageUtil pu=new PageUtil(request,action);
 	 
 </body>
 <script type="text/javascript">
-///需要修改的字段--扩展	
-function editCol(rowData) {
-	$('#method').attr('value', 'update');
-	$('#eid').attr('value', rowData.eid);
-	$('#name').attr('value', rowData.name);
-	$('#age').attr('value', rowData.age);
-
-	$('#join_time').attr('value', rowData.join_time);
-	$('#college').attr('value', rowData.college);
-	$('#graduate_time').attr('value', rowData.graduate_time);
-	$('#salary_month').attr('value', rowData.salary_month);
-	$('#job').attr('value', rowData.job);
-	$('#dept_id').attr('value', rowData.dept_id);
-	$('#dept_name').attr('value', rowData.dept_name);
-	
-	var sel = document.getElementById("status");
-	 clearSelect("status");
-	var op = window.document.createElement("option");
-	if(rowData.status=='1')	
-	   op.innerHTML ='在职';
-	else if(rowData.status=='0')	
-		op.innerHTML ='离职';
-	op.value = rowData.status;	
-	sel.appendChild(op);
-	sel.options[0].selected = true;
-	getBasePath();
-}
-//新增时清除--扩展
-function clearWin() {
-	$('#name').attr('value', '');
-	$('#age').attr('value', '');
-	$('#college').attr('value', '');
-	$('#graduate_time').attr('value', '');
-	$('#job').attr('value', '');
-	$('#status').attr('value', '');
-	$('#join_time').attr('value', '');
-	$('#dept_id').attr('value', '');
-	$('#dept_name').attr('value','');
-	$('#salary_month').attr('value','');
-}
+ 
 //查找时使用--扩展有命名规则,数据库字段_find
 function doFind() {
 	var where = "";

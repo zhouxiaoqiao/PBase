@@ -2,6 +2,7 @@
 <!DOCTYPE struts PUBLIC
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
+    <!-- 考勤管理 -->
 <struts>
 	<package name="adminAttence" namespace="/adminAttence"
 		extends="struts-default">

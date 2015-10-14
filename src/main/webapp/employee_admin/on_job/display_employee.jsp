@@ -12,12 +12,15 @@ PageUtil pu=new PageUtil(request,action);
 <base href="<%=pu.getBasePath()%>">
 <title>员工档案</title>
 <%@include file="/common/use_js.jsp" %> 
+<link rel="stylesheet" href="<%=pu.getBasePath()%>/styles/css/style.css"
+	type="text/css" media="all" />
+<link rel="stylesheet" type="text/css"
+	href="<%=pu.getBasePath()%>/styles/wbox/wbox/wbox.css" />
 <style type="text/css">
 #pagerId input {
 	height: 20px;
 }
 </style>
-
 <script type="text/javascript">
 var dept_id ='';
 if(parent['display_dept'].document.getElementById('pid')!=null)
@@ -94,109 +97,57 @@ if(parent['display_dept'].document.getElementById('pid')!=null)
 	<input type="hidden" id="printURL"
 		value="<%=pu.getBasePath()%>frameset?__report=report_admin/design/emp.rptdesign&whereSQL=<%=pu.getWhereSQL_print()%>">
  
-	<div id="findDiv" class="findWin" style="height: 180px;">
-		<div id="tite_findWin" class="fwTop" style="float: left;">
-			<span id="titeSpan">查找</span>
-		</div>
-		<div style="float: left; width:5%; height: 15px;background: #F0FFFF;"
-			onclick='closeWin(".findWin")'>
-			<img src="<%=pu.getBasePath()%>image/close.png" align="middle" />
-		</div>
-		<div id="find_div" class="fwContent" style="height: 180px;">
-			<div style="text-align: left;">
-				<br>
-				<form id="findForm"
-					action="<%=pu.getUrl()%>doFind.action"
-					name="findForm" method="post">
-					<table border="0" cellpadding="0" cellspacing="0">
-						<tr>
-							<td width="80" align="center">毕业院校</td>
-							<td width="120"><input type='text' name='college_find'
-								id='college_find' value='' /></td>
-						</tr>
-						<tr>
-							<td align="center">职业状态</td>
-							<td width="120">
-							<select name="status_find" id="status_find" style="width:80px" size="1" ondblclick='getSelectAjax("status_find","status")'>							
-							</select><span>双击</span>
-							</td>
-						</tr>
-						<tr>
-							<td align="center">入职时间</td>
-							<td><input type="text" name='join_time_find'
-								id='join_time_find' value='' onfocus="WdatePicker()" /></td>
-						</tr>
-						<tr>
-							<td align="center">员工年龄</td>
-							<td><input type='text' name='age_find' id='age_find'
-								value='' /></td>
-						</tr>
-					</table>
+	 
+<div id="findUnitDiv"style="visibility: hidden">
+	<form id="findForm" action="<%=pu.getUrl()%>doFind.action" name="findForm"
+			method="post">
+		 <table   class="table_all" align="center" border="0" cellpadding="0"
+				cellspacing="0" style="margin-top: 0px">
+				<tr>
+					<td class="td_table_1">员工姓名</td>
+					<td class="td_table_2"><input type='text' name='staff_name'
+						id='staff_name'   /> <input type="hidden" id="eid" name='eid'
+						value="" /></td>
+					<td class="td_table_1">职员状态</td>
+					<td class="td_table_2"><select name="status"
+							id="status">
+						        <option value="0">离职状态</option>
+								<option value="1">正式在职</option>
+								<option value="2">试用期</option>
+								<option value="3">延长试用期</option>
+						</select></td>
+					<td class="td_table_1">入职日期</td>
+					<td class="td_table_2"><input type='text' name='regular_date'
+						id='regular_date' onFocus="WdatePicker()"/></td>
+					<td class="td_table_1">年龄</td>
+					<td class="td_table_2"><input type='text' name='age'
+						id='age'  />  </td>
+				</tr>
+				<tr>
+					<td colspan="8" class="td_table_2"><div align="center">
+							<input name="button" type='button' class="button_70px"
+								onclick='doFind();' value='查 询'> <input
+								name="button" type='button' class="button_70px"
+								onClick="clearWin();" value='清 除'> 
+						</div></td>
+				</tr>
+				</table>
 				</form>
-			</div>
-			<div style="text-align: center;">
-				<br> <input type='button' onclick="doFind()"
-					style='width: 50px' value='查找 '> <input type='button'
-					onclick="clearWin();" style='width: 50px' value='清除'>
-
-			</div>
-		</div>
 	</div>
 </body>
 <script type="text/javascript">
-///需要修改的字段--扩展	
-function editCol(rowData) {
-	$('#method').attr('value', 'update');
-	 
-	$('#eid').attr('value', rowData.eid);
-	$('#full_name').attr('value', rowData.fullname);
-	$('#user_name').attr('value', rowData.username);
-	$('#age').attr('value', rowData.age);
 
-	$('#join_time').attr('value', rowData.join_time);
-	$('#college').attr('value', rowData.college);
-	$('#graduate_time').attr('value', rowData.graduate_time);
-	$('#salary_month').attr('value', rowData.salary_month);
-	$('#job_name').attr('value', rowData.jobname);
-	$('#dept_id').attr('value', rowData.org);
-	$('#dept_name').attr('value', rowData.dept_name);
-	
-	var sel = document.getElementById("status");
-	 clearSelect("status");
-	var op = window.document.createElement("option");
-	if(rowData.status=='1')	
-	   op.innerHTML ='在职';
-	else if(rowData.status=='0')	
-		op.innerHTML ='离职';
-	op.value = rowData.status;	
-	sel.appendChild(op);
-	sel.options[0].selected = true;
-	getBasePath();
-}
-//新增时清除--扩展
-function clearWin() {
-	$('#name').attr('value', '');
-	$('#age').attr('value', '');
-	$('#college').attr('value', '');
-	$('#graduate_time').attr('value', '');
-	$('#job').attr('value', '');
-	$('#status').attr('value', '');
-	$('#join_time').attr('value', '');
-	$('#dept_id').attr('value', '');
-	$('#dept_name').attr('value','');
-	$('#salary_month').attr('value','');
-}
 //查找时使用--扩展有命名规则,数据库字段_find
 function doFind() {
 	var where = "";
-	where = getWhere(where, "status_find");
-	where = getWhere(where, "college_find");
-	where = getWhere(where, "join_time_find");
-	where = getWhere(where, "age_find");
+	where = getWhere(where, "staff_name");
+	where = getWhere(where, "status");
+	where = getWhere(where, "join_time");
+	where = getWhere(where, "age");
 	if (where.length > 0)
 		where = " where " + where;
 	var url = document.getElementById("findForm").action + "?where="
-			+ where;
+			+ where+"&dept_id="+dept_id;
 	submitFrom("findForm", url);
 
 }

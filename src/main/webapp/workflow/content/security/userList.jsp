@@ -88,7 +88,7 @@
 					</td>
 					<td class="td_list_2" align=left nowrap>
 					<shiro:hasPermission name="USERDELETE">
-						<a href="${ctx}/security/user/delete/${user.id }" class="btnDel" title="删除" onclick="return confirmDel();">删除</a>
+						<a href="${ctx}/security/user/delete/${user.id }/${user.username}" class="btnDel" title="删除" onclick="return confirmDel();">删除</a>
 					</shiro:hasPermission>
 					<shiro:hasPermission name="USEREDIT">
 						<a href="${ctx}/security/user/update/${user.id }" class="btnEdit" title="编辑">编辑</a>

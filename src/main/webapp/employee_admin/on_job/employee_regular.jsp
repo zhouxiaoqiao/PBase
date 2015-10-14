@@ -90,7 +90,11 @@ PageUtil pu=new PageUtil(request,action);
 				var mulsel = $("#dataTableId").getGridParam('selarrrow');
 				if (gr != null && mulsel.length < 2) {
 					var rowData = $("#dataTableId").getRowData(gr);			
-					document.getElementById("editUnitDiv").style.visibility = "visible";
+				    if(document.getElementById("editUnitDiv").style.visibility != "visible")
+				        document.getElementById("editUnitDiv").style.visibility = "visible";
+					else
+						document.getElementById("editUnitDiv").style.visibility = "hidden";
+
 					$('#staff_name').attr('value', rowData.staff_name);
 				    $('#eid').attr('value', rowData.rowid);
 				} else if (mulsel.length > 1) {

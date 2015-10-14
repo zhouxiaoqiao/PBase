@@ -2,8 +2,10 @@ package org.snaker.framework.security.web;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.moon.service.inf.ITreeService;
 import org.snaker.framework.orm.Page;
 import org.snaker.framework.orm.PropertyFilter;
 import org.snaker.framework.security.entity.Org;
@@ -32,7 +34,8 @@ public class UserController {
 	//注入角色管理对象
 	@Autowired
 	private RoleManager roleManager;
-	
+	@Resource
+	private ITreeService treeService;
 	/**
 	 * 分页查询用户，返回用户列表视图
 	 * @param model
@@ -132,9 +135,10 @@ public class UserController {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(value = "delete/{id}")
-	public String delete(@PathVariable("id") Long id) {
-		userManager.delete(id);
+	@RequestMapping(value = "delete/{id}/{username}")
+	public String delete(@PathVariable("id") Long id,@PathVariable("username") String username) {
+		userManager.delete(id);		 
+		treeService.deleteUserMenuRight(username);
 		return "redirect:/security/user";
 	}
 }
